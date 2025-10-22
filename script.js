@@ -31,6 +31,35 @@ const users = {
     'L1A2R3I4': { name: 'Албаева Лариса Кадыровна', role: 'Учитель', avatar: 'ЛА' }
 };
 
+// Данные о местах с координатами
+const placesData = {
+    'Кофейня «Veranda»': {
+        coords: [59.9085, 29.0855],
+        address: 'Сосновый Бор, Ленинградская область',
+        description: 'Элегантная кофейня с панорамным видом'
+    },
+    'Кофейня «Мой Сосновый Бор»': {
+        coords: [59.9012, 29.0801],
+        address: 'Сосновый Бор, центральный район',
+        description: 'Уютное место в центре города'
+    },
+    'Ресторан «ПхалиХинкали»': {
+        coords: [59.9033, 29.0889],
+        address: 'Сосновый Бор, улица Ленинградская',
+        description: 'Аутентичная грузинская кухня'
+    },
+    'Ресторан «Токио-Сити»': {
+        coords: [59.9005, 29.0923],
+        address: 'Сосновый Бор, торговый комплекс',
+        description: 'Японская кухня премиум-класса'
+    },
+    'Территория отдыха «Хеваа»': {
+        coords: [59.9156, 29.0654],
+        address: 'Сосновый Бор, берег Финского залива',
+        description: 'Премиальный комплекс на берегу залива'
+    }
+};
+
 // DOM элементы
 const loginScreen = document.getElementById('login-screen');
 const mainContent = document.getElementById('main-content');
@@ -42,6 +71,17 @@ const userName = document.getElementById('user-name');
 const userRole = document.getElementById('user-role');
 const welcomeName = document.getElementById('welcome-name');
 const logoutBtn = document.getElementById('logout-btn');
+
+// Элементы карты
+const mapModal = document.getElementById('map-modal');
+const mapContainer = document.getElementById('map-container');
+const mapPlaceTitle = document.getElementById('map-place-title');
+const mapAddressText = document.getElementById('map-address-text');
+const closeMapModal = document.getElementById('close-map-modal');
+
+// Переменная для хранения карты
+let ymap = null;
+let currentPlace = null;
 
 // Проверяем, авторизован ли пользователь при загрузке
 window.addEventListener('load', () => {
@@ -56,7 +96,6 @@ window.addEventListener('load', () => {
 
 // Функция для показа уведомлений
 function showNotification(message, type = 'success') {
-    // Удаляем предыдущие уведомления
     const existingNotification = document.querySelector('.notification');
     if (existingNotification) {
         existingNotification.remove();
@@ -68,12 +107,10 @@ function showNotification(message, type = 'success') {
     
     document.body.appendChild(notification);
 
-    // Анимация появления
     setTimeout(() => {
         notification.classList.add('show');
     }, 100);
 
-    // Автоматическое скрытие
     setTimeout(() => {
         notification.classList.remove('show');
         setTimeout(() => {
@@ -86,14 +123,11 @@ function showNotification(message, type = 'success') {
 
 // Функция показа основного контента
 function showMainContent(user) {
-    // Обновляем приветствие
     welcomeName.textContent = user.name.split(' ')[0];
     
-    // Переходим на главный экран
     loginScreen.style.display = 'none';
     mainContent.style.display = 'block';
     
-    // Показываем приветствие
     if (user.role === 'Владелец сайта') {
         showNotification('Добро пожаловать, создатель! 🎉 Ваш сайт выглядит премиально!');
     } else if (user.role === 'Учитель') {
@@ -102,10 +136,7 @@ function showMainContent(user) {
         showNotification(`Добро пожаловать, ${user.name.split(' ')[0]}! ✨ Наслаждайтесь эксклюзивным контентом`);
     }
 
-    // Прокрутка к началу контента
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    
-    // Запускаем анимации карточек
     setTimeout(initCardAnimations, 500);
 }
 
@@ -118,83 +149,121 @@ function login() {
         return;
     }
 
-    // Показываем загрузку
     loginBtn.classList.add('loading');
     
-    // Имитация задержки сети
     setTimeout(() => {
         const user = users[key];
         
         if (user) {
-            // Показываем информацию о пользователе
             userAvatar.textContent = user.avatar;
             userName.textContent = user.name;
             userRole.textContent = user.role;
             userInfo.classList.add('show');
             
-            // Дополнительная задержка для плавного перехода
             setTimeout(() => {
-                // Сохраняем пользователя в localStorage
                 localStorage.setItem('currentUser', JSON.stringify(user));
-                
-                // Показываем основной контент
                 showMainContent(user);
             }, 800);
             
         } else {
             showNotification('Неверный ключ доступа', 'error');
-            // Анимация тряски input
             accessKeyInput.style.animation = 'shake 0.5s';
             setTimeout(() => {
                 accessKeyInput.style.animation = '';
             }, 500);
         }
         
-        // Скрываем загрузку
         loginBtn.classList.remove('loading');
     }, 1200);
 }
 
 // Функция выхода
 function logout() {
-    // Удаляем пользователя из localStorage
     localStorage.removeItem('currentUser');
-    
-    // Сбрасываем форму
     accessKeyInput.value = '';
     userInfo.classList.remove('show');
-    
-    // Возвращаемся к экрану входа
     mainContent.style.display = 'none';
     loginScreen.style.display = 'flex';
-    
-    // Фокусируемся на input
     accessKeyInput.focus();
-    
     showNotification('Вы вышли из системы. Возвращайтесь скорее! 👋');
 }
 
-// Обработчики событий
-loginBtn.addEventListener('click', login);
+// Функция инициализации карты
+function initMap(placeName) {
+    const place = placesData[placeName];
+    if (!place) return;
 
-accessKeyInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-        login();
+    currentPlace = place;
+
+    // Очищаем контейнер карты
+    mapContainer.innerHTML = '';
+    
+    // Создаем карту
+    ymap = new ymaps.Map(mapContainer, {
+        center: place.coords,
+        zoom: 15,
+        controls: ['zoomControl', 'fullscreenControl']
+    }, {
+        searchControlProvider: 'yandex#search'
+    });
+
+    // Добавляем метку
+    const placemark = new ymaps.Placemark(place.coords, {
+        balloonContent: `
+            <div style="padding: 10px;">
+                <h3 style="margin: 0 0 8px 0; color: #333;">${placeName}</h3>
+                <p style="margin: 0; color: #666;">${place.description}</p>
+                <p style="margin: 8px 0 0 0; color: #888;">${place.address}</p>
+            </div>
+        `
+    }, {
+        preset: 'islands#redDotIcon'
+    });
+
+    ymap.geoObjects.add(placemark);
+    
+    // Открываем балун
+    placemark.balloon.open();
+
+    // Обновляем информацию в модальном окне
+    mapPlaceTitle.textContent = placeName;
+    mapAddressText.textContent = place.address;
+}
+
+// Функция показа карты
+function showMap(placeName) {
+    if (!placeName || !placesData[placeName]) {
+        showNotification('Информация о местоположении временно недоступна', 'error');
+        return;
     }
-});
 
-logoutBtn.addEventListener('click', logout);
+    mapModal.classList.add('show');
+    document.body.style.overflow = 'hidden';
 
-// Анимация тряски для ошибок
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes shake {
-        0%, 100% { transform: translateX(0); }
-        25% { transform: translateX(-5px); }
-        75% { transform: translateX(5px); }
+    // Если Яндекс Карты уже загружены, инициализируем карту
+    if (window.ymaps) {
+        ymaps.ready(() => initMap(placeName));
+    } else {
+        // Загружаем Яндекс Карты
+        const script = document.createElement('script');
+        script.src = 'https://api-maps.yandex.ru/2.1/?lang=ru_RU';
+        script.onload = () => {
+            ymaps.ready(() => initMap(placeName));
+        };
+        document.head.appendChild(script);
     }
-`;
-document.head.appendChild(style);
+}
+
+// Функция скрытия карты
+function hideMap() {
+    mapModal.classList.remove('show');
+    document.body.style.overflow = 'auto';
+    
+    if (ymap) {
+        ymap.destroy();
+        ymap = null;
+    }
+}
 
 // Анимации карточек
 function initCardAnimations() {
@@ -221,19 +290,61 @@ function initCardAnimations() {
     });
 }
 
+// Обработчики событий
+loginBtn.addEventListener('click', login);
+
+accessKeyInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        login();
+    }
+});
+
+logoutBtn.addEventListener('click', logout);
+
+closeMapModal.addEventListener('click', hideMap);
+
+// Закрытие модального окна при клике вне его
+mapModal.addEventListener('click', (e) => {
+    if (e.target === mapModal) {
+        hideMap();
+    }
+});
+
+// Закрытие модального окна по ESC
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && mapModal.classList.contains('show')) {
+        hideMap();
+    }
+});
+
 // Обработчики для кнопок действий
 document.addEventListener('click', (e) => {
     if (e.target.classList.contains('action-btn') || 
         e.target.closest('.action-btn')) {
         const btn = e.target.classList.contains('action-btn') ? e.target : e.target.closest('.action-btn');
+        const card = btn.closest('.place-card');
+        const placeName = card.querySelector('.card-title').textContent;
         
         if (btn.classList.contains('primary')) {
             showNotification('Функция бронирования скоро будет доступна! 📅');
+        } else if (btn.querySelector('.fa-map-marker-alt') || btn.textContent.includes('карте')) {
+            showMap(placeName);
         } else {
-            showNotification('Карта locations скоро будет добавлена! 🗺️');
+            showNotification('Функция скоро будет доступна! ⚡');
         }
     }
 });
+
+// Анимация тряски для ошибок
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
+    }
+`;
+document.head.appendChild(style);
 
 // Консольная информация для отладки
 console.log('🌲 Премиум гид Сосновый Бор - Доступные ключи:');
@@ -241,7 +352,7 @@ console.log('⭐ Особые ключи:');
 console.log('   B4G5R6T7 - Бебия Баграт (Владелец сайта)');
 console.log('   L1A2R3I4 - Албаева Лариса Кадыровна (Учитель)');
 console.log('');
-console.log('🏪 Доступные места:');
-console.log('   ☕ Кофейни: Veranda, Мой Сосновый Бор');
-console.log('   🍽️ Рестораны: ПхалиХинкали, Токио-Сити');
-console.log('   🏖️ Территория отдыха: Хеваа');
+console.log('🏪 Доступные места на карте:');
+Object.keys(placesData).forEach(place => {
+    console.log(`   📍 ${place} - ${placesData[place].address}`);
+});
