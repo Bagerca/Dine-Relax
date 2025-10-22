@@ -34,29 +34,76 @@ const users = {
 // Данные о местах с координатами
 const placesData = {
     'Кофейня «Veranda»': {
-        coords: [59.900924, 29.085919],
-        address: 'Сосновый Бор, Ленинградская область',
-        description: 'Элегантная кофейня с панорамным видом'
+        coords: [59.880945, 29.112260],
+        address: 'Сосновый Бор, Солнечная улица, 12, ТРК «Галактика»',
+        description: 'Спешелти кофейня со свежеобжаренным зерном, домашними десертами и вегетарианскими блюдами',
+        phone: '+7 (921) 904-69-20',
+        workingHours: 'Пн-Чт: 10:00–20:00, Пт-Вс: 10:00–21:00',
+        rating: 4.8,
+        reviewsCount: 334,
+        price: '$$',
+        features: ['Wi-Fi', 'Парковка', 'Терраса', 'Доступно с животными', 'Бесплатная вода'],
+        social: 'vk.com/verandacoffee'
     },
-    'Кофейня «Мой Сосновый Бор»': {
-        coords: [59.896876, 29.085630],
-        address: 'Сосновый Бор, центральный район',
-        description: 'Уютное место в центре города'
+    'Кафе-пекарня «Мой Сосновый Бор»': {
+        coords: [59.880816, 29.112933],
+        address: 'Сосновый Бор, Солнечная улица, 9',
+        description: 'Уютная кофейня-пекарня с большой выбором десертов, сытных блюд и детской комнатой',
+        phone: '+7 (921) 882-40-02',
+        workingHours: 'Пн-Пт: 09:00–22:00, Сб-Вс: 10:00–22:00',
+        rating: 4.5,
+        reviewsCount: 390,
+        price: '$$',
+        features: ['Wi-Fi', 'Парковка', 'Летняя веранда', 'Детская комната', 'Доставка'],
+        social: 'vk.com/coffeesbor'
     },
     'Ресторан «ПхалиХинкали»': {
-        coords: [59.897286, 29.078938],
-        address: 'Сосновый Бор, улица Ленинградская',
-        description: 'Аутентичная грузинская кухня'
+        coords: [59.880479, 29.117188],
+        address: 'Сосновый Бор, Ленинградская улица, 46',
+        description: 'Аутентичный ресторан грузинской кухни, известный сочными хинкали и традиционными блюдами',
+        phone: '+7 (812) 904-44-90',
+        workingHours: 'Пн-Чт: 12:00–23:00, Пт-Сб: 12:00–00:00, Вс: 12:00–23:00',
+        rating: 4.6,
+        reviewsCount: 1382,
+        price: '$$',
+        features: ['Детская площадка', 'Банкетный зал', 'Доставка', 'Живая музыка'],
+        social: 'phali-hinkali.ru/sbr'
     },
     'Ресторан «Токио-Сити»': {
-        coords: [59.900980, 29.086004],
-        address: 'Сосновый Бор, торговый комплекс',
-        description: 'Японская кухня премиум-класса'
+        coords: [59.880945, 29.112260],
+        address: 'Сосновый Бор, Солнечная улица, 12, ТРК «Галактика», 3 этаж',
+        description: 'Ресторан с широким выбором блюд японской, итальянской, мексиканской и других кухонь',
+        phone: '+7 (812) 677-41-12',
+        workingHours: 'Пн-Чт: 12:00–23:00, Пт-Сб: 12:00–01:00, Вс: 12:00–23:00',
+        rating: 3.9,
+        reviewsCount: 26,
+        price: '$$',
+        features: ['600+ позиций в меню', 'Доставка', 'Бронирование', 'Детское меню'],
+        social: 'tokyo-city.ru/spb/restaurants/sosnovyy-bor'
     },
-    'Территория отдыха «Хеваа»': {
-        coords: [59.894588, 29.058949],
-        address: 'Сосновый Бор, берег Финского залива',
-        description: 'Премиальный комплекс на берегу залива'
+    'Гастробар «Хеваа»': {
+        coords: [59.897457, 29.117188],
+        address: 'Сосновый Бор, Устьинская улица, 11/2',
+        description: 'Гриль-бар при комплексе Hevaa с блюдами на гриле, бургерами, стейками и уютной атмосферой у моря',
+        phone: '+7 (812) 220-15-22',
+        workingHours: 'Круглосуточно',
+        rating: 4.3,
+        reviewsCount: 1213,
+        price: '$$',
+        features: ['Круглосуточно', 'Беседки', 'Летняя площадка', 'Гриль', 'Коктейли'],
+        social: 'hevaa.ru'
+    },
+    'Гранд-кафе «Багратион»': {
+        coords: [59.886361, 29.117621],
+        address: 'Сосновый Бор, Проспект Героев, 65А',
+        description: 'Гранд-кафе с разнообразной европейской и грузинской кухней, живой музыкой и уютной атмосферой',
+        phone: '+7 (965) 752-22-82',
+        workingHours: 'Пн-Чт: 11:00–23:00, Пт-Сб: 11:00–01:00, Вс: 11:00–23:00',
+        rating: 4.3,
+        reviewsCount: 260,
+        price: '$$',
+        features: ['Живая музыка', 'Доставка', 'Бесплатная парковка', 'Европейская кухня'],
+        social: ''
     }
 };
 
@@ -201,23 +248,43 @@ function initMap(placeName) {
     // Создаем карту
     ymap = new ymaps.Map(mapContainer, {
         center: place.coords,
-        zoom: 15,
+        zoom: 16,
         controls: ['zoomControl', 'fullscreenControl']
     }, {
         searchControlProvider: 'yandex#search'
     });
 
+    // Создаем содержимое балуна
+    const balloonContent = `
+        <div style="padding: 15px; max-width: 300px; font-family: Arial, sans-serif;">
+            <h3 style="margin: 0 0 10px 0; color: #333; font-size: 18px;">${placeName}</h3>
+            <p style="margin: 0 0 8px 0; color: #666; font-size: 14px;">${place.description}</p>
+            <div style="margin: 8px 0;">
+                <strong style="color: #333;">📞 Телефон:</strong> 
+                <span style="color: #666;">${place.phone}</span>
+            </div>
+            <div style="margin: 8px 0;">
+                <strong style="color: #333;">🕒 Время работы:</strong> 
+                <span style="color: #666;">${place.workingHours}</span>
+            </div>
+            <div style="margin: 8px 0;">
+                <strong style="color: #333;">⭐ Рейтинг:</strong> 
+                <span style="color: #666;">${place.rating} (${place.reviewsCount} отзывов)</span>
+            </div>
+            <div style="margin: 8px 0;">
+                <strong style="color: #333;">📍 Адрес:</strong> 
+                <span style="color: #666;">${place.address}</span>
+            </div>
+        </div>
+    `;
+
     // Добавляем метку
     const placemark = new ymaps.Placemark(place.coords, {
-        balloonContent: `
-            <div style="padding: 10px;">
-                <h3 style="margin: 0 0 8px 0; color: #333;">${placeName}</h3>
-                <p style="margin: 0; color: #666;">${place.description}</p>
-                <p style="margin: 8px 0 0 0; color: #888;">${place.address}</p>
-            </div>
-        `
+        balloonContent: balloonContent
     }, {
-        preset: 'islands#redDotIcon'
+        preset: 'islands#redDotIcon',
+        balloonCloseButton: true,
+        hideIconOnBalloonOpen: false
     });
 
     ymap.geoObjects.add(placemark);
@@ -324,9 +391,25 @@ document.addEventListener('click', (e) => {
         const btn = e.target.classList.contains('action-btn') ? e.target : e.target.closest('.action-btn');
         const card = btn.closest('.place-card');
         const placeName = card.querySelector('.card-title').textContent;
+        const place = placesData[placeName];
         
         if (btn.classList.contains('primary')) {
-            showNotification('Функция бронирования скоро будет доступна! 📅');
+            if (btn.querySelector('.fa-vk') && place.social) {
+                // Открываем VK
+                if (place.social.includes('vk.com')) {
+                    window.open(`https://${place.social}`, '_blank');
+                } else {
+                    window.open(place.social, '_blank');
+                }
+            } else if (btn.querySelector('.fa-globe') && place.social) {
+                // Открываем сайт
+                window.open(`https://${place.social}`, '_blank');
+            } else if (btn.querySelector('.fa-phone') && place.phone) {
+                // Звонок
+                window.open(`tel:${place.phone.replace(/[^0-9+]/g, '')}`, '_self');
+            } else {
+                showNotification('Контактная информация скоро будет доступна! 📞');
+            }
         } else if (btn.querySelector('.fa-map-marker-alt') || btn.textContent.includes('карте')) {
             showMap(placeName);
         } else {
