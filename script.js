@@ -102,8 +102,8 @@ function login() {
                 welcomeName.textContent = user.name.split(' ')[0];
                 
                 // Переходим на главный экран
-                loginScreen.classList.add('hidden');
-                mainContent.classList.remove('hidden');
+                loginScreen.classList.remove('active');
+                mainContent.classList.add('active');
                 
                 // Показываем приветствие
                 if (user.role === 'Владелец сайта') {
@@ -134,8 +134,8 @@ function login() {
 
 // Функция выхода
 function logout() {
-    mainContent.classList.add('hidden');
-    loginScreen.classList.remove('hidden');
+    mainContent.classList.remove('active');
+    loginScreen.classList.add('active');
     
     // Сбрасываем форму
     accessKeyInput.value = '';
@@ -171,13 +171,6 @@ window.addEventListener('load', () => {
     accessKeyInput.focus();
 });
 
-// Плавная прокрутка для индикатора
-document.querySelector('.scroll-indicator').addEventListener('click', () => {
-    document.querySelector('.places-grid').scrollIntoView({ 
-        behavior: 'smooth' 
-    });
-});
-
 // Анимация появления карточек при скролле
 const observerOptions = {
     threshold: 0.1,
@@ -206,10 +199,27 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 100);
 });
 
+// Обработчики для кнопок действий
+document.addEventListener('click', (e) => {
+    if (e.target.classList.contains('action-btn') || 
+        e.target.closest('.action-btn')) {
+        const btn = e.target.classList.contains('action-btn') ? e.target : e.target.closest('.action-btn');
+        
+        if (btn.classList.contains('primary')) {
+            showNotification('Функция бронирования скоро будет доступна! 📅');
+        } else {
+            showNotification('Карта locations скоро будет добавлена! 🗺️');
+        }
+    }
+});
+
 // Консольная информация для отладки
 console.log('🌲 Премиум гид Сосновый Бор - Доступные ключи:');
 console.log('⭐ Особые ключи:');
 console.log('   B4G5R6T7 - Бебия Баграт (Владелец сайта)');
 console.log('   L1A2R3I4 - Албаева Лариса Кадыровна (Учитель)');
 console.log('');
-console.log('🍽️ Доступные места: Веранда, Хева, Пхали Хинкали, Токио Сити, База отдыха Сосновый Бор');
+console.log('🏪 Доступные места:');
+console.log('   ☕ Кофейни: Veranda, Мой Сосновый Бор');
+console.log('   🍽️ Рестораны: ПхалиХинкали, Токио-Сити');
+console.log('   🏖️ Территория отдыха: Хеваа');
