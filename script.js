@@ -95,7 +95,7 @@ const placesData = {
     },
     'Гранд-кафе «Багратион»': {
         coords: [59.886361, 29.117621],
-        address: 'Сосновый Бор, Проспект Героев, 65А',
+        address: 'Сосновый Бор, Проспект Героев, 65A',
         description: 'Гранд-кафе с разнообразной европейской и грузинской кухней, живой музыкой и уютной атмосферой',
         phone: '+7 (965) 752-22-82',
         workingHours: 'Пн-Чт: 11:00–23:00, Пт-Сб: 11:00–01:00, Вс: 11:00–23:00',
@@ -193,6 +193,10 @@ let currentPlaceName = '';
 let ymap = null;
 let currentPlace = null;
 
+// Система голосования
+let votingData = {};
+let currentUserKey = '';
+
 // Проверяем, авторизован ли пользователь при загрузке
 window.addEventListener('load', () => {
     const savedUser = localStorage.getItem('currentUser');
@@ -250,6 +254,18 @@ function showMainContent(user) {
     const displayName = formatDisplayName(user);
     welcomeName.textContent = displayName;
     
+    // Сохраняем ключ пользователя
+    if (users[user.key]) {
+        currentUserKey = user.key;
+    } else {
+        // Находим ключ по имени (fallback)
+        const userEntry = Object.entries(users).find(([key, u]) => u.name === user.name && u.role === user.role);
+        if (userEntry) {
+            currentUserKey = userEntry[0];
+            user.key = currentUserKey; // сохраняем ключ в объекте пользователя
+        }
+    }
+    
     loginScreen.style.display = 'none';
     mainContent.style.display = 'block';
     
@@ -258,11 +274,18 @@ function showMainContent(user) {
     } else if (user.role === 'Учитель') {
         showNotification('Здравствуйте, Лариса Кадыровна! 👩‍🏫 Добро пожаловать!');
     } else {
-        showNotification(`Добро пожаловать, ${displayName}! ✨ Наслаждайтесь эксклюзивным контентом`);
+        showNotification(`Добро пожаловать, ${displayName}! ✨ Теперь вы можете голосовать за любимые места`);
     }
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
     setTimeout(initCardAnimations, 500);
+    
+    // Инициализируем систему голосования
+    setTimeout(() => {
+        initVotingSystem();
+        updateVoteButtons();
+        setupVotesSearch();
+    }, 1000);
 }
 
 // Функция входа
@@ -284,6 +307,9 @@ function login() {
             userName.textContent = user.name;
             userRole.textContent = user.role;
             userInfo.classList.add('show');
+            
+            // Сохраняем ключ в объекте пользователя
+            user.key = key;
             
             setTimeout(() => {
                 localStorage.setItem('currentUser', JSON.stringify(user));
@@ -526,6 +552,348 @@ function initCardAnimations() {
     });
 }
 
+// СИСТЕМА ГОЛОСОВАНИЯ
+
+// Инициализация системы голосования
+function initVotingSystem() {
+    loadVotingData();
+    setupVotingButtons();
+    renderVotingResults();
+}
+
+// Загрузка данных голосования
+function loadVotingData() {
+    const saved = localStorage.getItem('sborVotingData');
+    if (saved) {
+        votingData = JSON.parse(saved);
+    }
+    
+    // Получаем текущего пользователя
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    if (currentUser && currentUser.key) {
+        currentUserKey = currentUser.key;
+    }
+}
+
+// Сохранение данных голосования
+function saveVotingData() {
+    localStorage.setItem('sborVotingData', JSON.stringify(votingData));
+    renderVotingResults();
+}
+
+// Настройка кнопок голосования
+function setupVotingButtons() {
+    document.addEventListener('click', (e) => {
+        if (e.target.classList.contains('vote-btn') || e.target.closest('.vote-btn')) {
+            const btn = e.target.classList.contains('vote-btn') ? e.target : e.target.closest('.vote-btn');
+            const card = btn.closest('.place-card');
+            const placeName = card.querySelector('.card-title').textContent;
+            
+            handleVote(placeName);
+        }
+        
+        if (e.target.classList.contains('change-vote-btn') || e.target.closest('.change-vote-btn')) {
+            showVotingModal();
+        }
+    });
+}
+
+// Обработка голоса
+function handleVote(placeName) {
+    if (!currentUserKey) {
+        showNotification('Для голосования необходимо войти в систему', 'error');
+        return;
+    }
+    
+    const currentUser = users[currentUserKey];
+    if (!currentUser) {
+        showNotification('Ошибка: пользователь не найден', 'error');
+        return;
+    }
+    
+    // Инициализируем запись пользователя если её нет
+    if (!votingData[currentUserKey]) {
+        votingData[currentUserKey] = {
+            name: currentUser.name,
+            role: currentUser.role,
+            avatar: currentUser.avatar,
+            votedFor: []
+        };
+    }
+    
+    const userVote = votingData[currentUserKey];
+    const hasVoted = userVote.votedFor.includes(placeName);
+    
+    if (hasVoted) {
+        // Убираем голос
+        userVote.votedFor = userVote.votedFor.filter(place => place !== placeName);
+        showNotification(`Голос за "${placeName}" отменен`, 'success');
+    } else {
+        // Добавляем голос
+        userVote.votedFor.push(placeName);
+        showNotification(`Вы проголосовали за "${placeName}"! 👍`, 'success');
+    }
+    
+    saveVotingData();
+    updateVoteButtons();
+}
+
+// Обновление кнопок голосования
+function updateVoteButtons() {
+    const voteButtons = document.querySelectorAll('.vote-btn');
+    const currentUserVotes = votingData[currentUserKey] ? votingData[currentUserKey].votedFor : [];
+    
+    voteButtons.forEach(btn => {
+        const card = btn.closest('.place-card');
+        const placeName = card.querySelector('.card-title').textContent;
+        const hasVoted = currentUserVotes.includes(placeName);
+        
+        if (hasVoted) {
+            btn.classList.add('voted');
+            btn.innerHTML = '<i class="fas fa-check"></i> Ваш выбор';
+        } else {
+            btn.classList.remove('voted');
+            btn.innerHTML = '<i class="fas fa-vote-yea"></i> Голосовать';
+        }
+    });
+}
+
+// Рендеринг результатов голосования
+function renderVotingResults() {
+    renderChart();
+    renderVotesList();
+}
+
+// Рендеринг диаграммы
+function renderChart() {
+    const canvas = document.getElementById('votes-chart');
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    const container = canvas.parentElement;
+    
+    // Устанавливаем размеры canvas
+    canvas.width = container.clientWidth;
+    canvas.height = container.clientHeight;
+    
+    // Очищаем canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Считаем голоса
+    const voteCounts = {};
+    Object.values(votingData).forEach(user => {
+        user.votedFor.forEach(place => {
+            voteCounts[place] = (voteCounts[place] || 0) + 1;
+        });
+    });
+    
+    // Сортируем по количеству голосов
+    const sortedPlaces = Object.entries(voteCounts)
+        .sort(([,a], [,b]) => b - a);
+    
+    // Обновляем общее количество голосов
+    const totalVotes = Object.values(voteCounts).reduce((sum, count) => sum + count, 0);
+    document.getElementById('total-votes-count').textContent = totalVotes;
+    
+    if (sortedPlaces.length === 0) {
+        // Показываем сообщение когда нет голосов
+        ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-secondary');
+        ctx.font = '16px Inter';
+        ctx.textAlign = 'center';
+        ctx.fillText('Пока нет голосов. Будьте первым!', canvas.width / 2, canvas.height / 2);
+        return;
+    }
+    
+    const maxVotes = Math.max(...Object.values(voteCounts));
+    const barWidth = (canvas.width - 100) / sortedPlaces.length;
+    const maxBarHeight = canvas.height - 120;
+    
+    // Рисуем столбцы
+    sortedPlaces.forEach(([place, votes], index) => {
+        const barHeight = (votes / maxVotes) * maxBarHeight;
+        const x = 50 + index * barWidth;
+        const y = canvas.height - 70 - barHeight;
+        
+        // Градиент для столбца
+        const gradient = ctx.createLinearGradient(x, y, x, y + barHeight);
+        gradient.addColorStop(0, '#ff6b35');
+        gradient.addColorStop(1, '#ff8c5a');
+        
+        // Столбец
+        ctx.fillStyle = gradient;
+        ctx.fillRect(x, y, barWidth - 10, barHeight);
+        
+        // Тень
+        ctx.shadowColor = 'rgba(255, 107, 53, 0.3)';
+        ctx.shadowBlur = 10;
+        ctx.shadowOffsetY = 5;
+        ctx.fillRect(x, y, barWidth - 10, barHeight);
+        ctx.shadowColor = 'transparent';
+        
+        // Количество голосов
+        ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-primary');
+        ctx.font = 'bold 14px Inter';
+        ctx.textAlign = 'center';
+        ctx.fillText(votes, x + (barWidth - 10) / 2, y - 10);
+        
+        // Название места (сокращаем если длинное)
+        ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-secondary');
+        ctx.font = '12px Inter';
+        let displayName = place;
+        if (displayName.length > 15) {
+            displayName = displayName.substring(0, 15) + '...';
+        }
+        ctx.fillText(displayName, x + (barWidth - 10) / 2, canvas.height - 40);
+    });
+}
+
+// Рендеринг списка голосов
+function renderVotesList() {
+    const container = document.getElementById('votes-list');
+    if (!container) return;
+    
+    const searchTerm = document.getElementById('votes-search')?.value.toLowerCase() || '';
+    
+    let filteredUsers = Object.entries(votingData);
+    
+    // Фильтрация по поиску
+    if (searchTerm) {
+        filteredUsers = filteredUsers.filter(([key, user]) => 
+            user.name.toLowerCase().includes(searchTerm) ||
+            user.votedFor.some(place => place.toLowerCase().includes(searchTerm))
+        );
+    }
+    
+    if (filteredUsers.length === 0) {
+        container.innerHTML = `
+            <div class="no-votes" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                <i class="fas fa-users" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                <p>Пока никто не проголосовал</p>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = filteredUsers.map(([key, user]) => `
+        <div class="vote-item">
+            <div class="voter-avatar">${user.avatar}</div>
+            <div class="voter-info">
+                <div class="voter-name">${user.name}</div>
+                <div class="voter-role">${user.role}</div>
+                ${user.votedFor.length > 0 ? `
+                    <div class="vote-selection">
+                        ${user.votedFor.map(place => `
+                            <span class="voted-place">
+                                <i class="fas fa-map-marker-alt"></i>
+                                ${place}
+                            </span>
+                        `).join('')}
+                    </div>
+                ` : '<div class="vote-selection" style="color: var(--text-muted); font-size: 0.9rem;">Ещё не голосовал</div>'}
+            </div>
+            ${key === currentUserKey ? `
+                <div class="vote-actions">
+                    <button class="change-vote-btn">
+                        <i class="fas fa-edit"></i>
+                        Изменить
+                    </button>
+                </div>
+            ` : ''}
+        </div>
+    `).join('');
+}
+
+// Модальное окно для изменения голосов
+function showVotingModal() {
+    const currentUserVotes = votingData[currentUserKey] ? votingData[currentUserKey].votedFor : [];
+    
+    let modalHTML = `
+        <div class="image-modal show" id="voting-modal">
+            <div class="image-modal-content" style="max-width: 600px;">
+                <button class="close-image-btn" onclick="hideVotingModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+                <div style="padding: 2rem;">
+                    <h2 style="font-family: 'Playfair Display', serif; margin-bottom: 1.5rem; text-align: center;">
+                        Ваши голоса
+                    </h2>
+                    <div style="margin-bottom: 2rem; color: var(--text-secondary); text-align: center;">
+                        Выберите заведения, которые вам нравятся
+                    </div>
+                    <div class="voting-options" style="display: grid; gap: 1rem; max-height: 400px; overflow-y: auto;">
+    `;
+    
+    Object.keys(placesData).forEach(placeName => {
+        const isVoted = currentUserVotes.includes(placeName);
+        modalHTML += `
+            <div class="voting-option" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid ${isVoted ? 'var(--accent)' : 'var(--border)'};">
+                <label style="display: flex; align-items: center; gap: 1rem; cursor: pointer; flex: 1;">
+                    <input type="checkbox" ${isVoted ? 'checked' : ''} value="${placeName}" 
+                           style="accent-color: var(--accent); transform: scale(1.2);">
+                    <span style="color: var(--text-primary); font-weight: 500;">${placeName}</span>
+                </label>
+            </div>
+        `;
+    });
+    
+    modalHTML += `
+                    </div>
+                    <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                        <button onclick="hideVotingModal()" style="flex: 1; padding: 1rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--text-primary); border-radius: 8px; cursor: pointer;">
+                            Отмена
+                        </button>
+                        <button onclick="saveVotesFromModal()" style="flex: 1; padding: 1rem; background: var(--gradient-primary); border: none; color: white; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                            Сохранить выбор
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Добавляем модальное окно в body
+    const modalContainer = document.createElement('div');
+    modalContainer.innerHTML = modalHTML;
+    document.body.appendChild(modalContainer);
+    document.body.style.overflow = 'hidden';
+}
+
+function hideVotingModal() {
+    const modal = document.getElementById('voting-modal');
+    if (modal) {
+        modal.remove();
+    }
+    document.body.style.overflow = 'auto';
+}
+
+function saveVotesFromModal() {
+    const checkboxes = document.querySelectorAll('.voting-option input[type="checkbox"]:checked');
+    const selectedPlaces = Array.from(checkboxes).map(cb => cb.value);
+    
+    if (!votingData[currentUserKey]) {
+        const currentUser = users[currentUserKey];
+        votingData[currentUserKey] = {
+            name: currentUser.name,
+            role: currentUser.role,
+            avatar: currentUser.avatar,
+            votedFor: []
+        };
+    }
+    
+    votingData[currentUserKey].votedFor = selectedPlaces;
+    saveVotingData();
+    hideVotingModal();
+    showNotification('Ваши голоса сохранены! 🗳️', 'success');
+}
+
+// Поиск в списке голосов
+function setupVotesSearch() {
+    const searchInput = document.getElementById('votes-search');
+    if (searchInput) {
+        searchInput.addEventListener('input', renderVotesList);
+    }
+}
+
 // Обработчики событий
 loginBtn.addEventListener('click', login);
 
@@ -565,6 +933,12 @@ document.addEventListener('keydown', (e) => {
         }
         if (imageModal.classList.contains('show')) {
             hideFullscreenImage();
+        }
+        
+        // Закрытие модального окна голосования
+        const votingModal = document.getElementById('voting-modal');
+        if (votingModal) {
+            hideVotingModal();
         }
     }
     
@@ -643,6 +1017,25 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
+// Авто-обновление результатов каждые 10 секунд
+setInterval(() => {
+    if (document.getElementById('voting-section')) {
+        loadVotingData();
+        renderVotingResults();
+        updateVoteButtons();
+    }
+}, 10000);
+
+// Показ уведомления о новом голосовании
+window.addEventListener('storage', (e) => {
+    if (e.key === 'sborVotingData') {
+        showNotification('Результаты голосования обновлены! 🔄', 'success');
+        loadVotingData();
+        renderVotingResults();
+        updateVoteButtons();
+    }
+});
+
 // Консольная информация для отладки
 console.log('🌲 Премиум гид Сосновый Бор - Доступные ключи:');
 console.log('⭐ Особые ключи:');
@@ -653,3 +1046,8 @@ console.log('🏪 Доступные места на карте:');
 Object.keys(placesData).forEach(place => {
     console.log(`   📍 ${place} - ${placesData[place].address}`);
 });
+console.log('');
+console.log('🗳️ Система голосования активирована!');
+console.log('Доступные команды:');
+console.log('   - showVotingModal() - открыть окно выбора голосов');
+console.log('   - renderVotingResults() - перерисовать результаты');
