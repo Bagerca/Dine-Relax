@@ -28,7 +28,7 @@ const users = {
     'P7O8L9I0': { name: 'Янцевич Полина', role: 'Ученик', avatar: 'ПЯ' },
     
     // Учитель
-    'L1A2R3I4': { name: 'Албаева Лариса Кадыровна', role: 'Учитель', avatar: 'ЛК' }
+    'L1A2R3I4': { name: 'Албаева Лариса Кадыровна', role: 'Учитель', avatar: 'ЛА' }
 };
 
 // Данные о местах с координатами
@@ -104,7 +104,51 @@ const placesData = {
         price: '$$',
         features: ['Живая музыка', 'Доставка', 'Бесплатная парковка', 'Европейская кухня'],
         social: ''
+    },
+    'Кинотеатр «Современник»': {
+        coords: [59.91185, 29.07062],
+        address: 'Сосновый Бор, Комсомольская улица, 17',
+        description: 'Городской кинотеатр с суши-баром «Кин-но». Удобные кресла, хорошее качество звука. Идеальное место для отдыха с просмотром фильмов и японской кухней.',
+        phone: '+7 (81369) 2-12-32',
+        workingHours: 'Кинотеатр: 11:00–00:00, Бар «Кин-но»: 12:00–02:00 (до 03:00 Пт-Сб)',
+        rating: 3.9,
+        reviewsCount: 1000,
+        price: '$$',
+        features: ['Суши-бар «Кин-но»', 'Удобные кресла', 'Хороший звук', 'Несколько залов', 'Японская кухня'],
+        social: 'sovremennik.sbor.net'
     }
+};
+
+// Данные с изображениями для каждого заведения
+const placeImages = {
+    'Кофейня «Veranda»': [
+        'https://example.com/veranda1.jpg',
+        'https://example.com/veranda2.jpg'
+    ],
+    'Кафе-пекарня «Мой Сосновый Бор»': [
+        'https://example.com/moy-sbor1.jpg',
+        'https://example.com/moy-sbor2.jpg'
+    ],
+    'Ресторан «ПхалиХинкали»': [
+        'https://example.com/phali1.jpg',
+        'https://example.com/phali2.jpg'
+    ],
+    'Ресторан «Токио-Сити»': [
+        'https://example.com/tokyo1.jpg',
+        'https://example.com/tokyo2.jpg'
+    ],
+    'Гранд-кафе «Багратион»': [
+        'https://example.com/bagration1.jpg',
+        'https://example.com/bagration2.jpg'
+    ],
+    'Гастробар «Хеваа»': [
+        'https://example.com/hevaa1.jpg',
+        'https://example.com/hevaa2.jpg'
+    ],
+    'Кинотеатр «Современник»': [
+        'https://example.com/sovremennik1.jpg',
+        'https://example.com/sovremennik2.jpg'
+    ]
 };
 
 // DOM элементы
@@ -125,6 +169,12 @@ const mapContainer = document.getElementById('map-container');
 const mapPlaceTitle = document.getElementById('map-place-title');
 const mapAddressText = document.getElementById('map-address-text');
 const closeMapModal = document.getElementById('close-map-modal');
+
+// Элементы для изображений
+const imageModal = document.getElementById('image-modal');
+const fullscreenImage = document.getElementById('fullscreen-image');
+const imageModalTitle = document.getElementById('image-modal-title');
+const closeImageModal = document.getElementById('close-image-modal');
 
 // Переменная для хранения карты
 let ymap = null;
@@ -347,6 +397,56 @@ function hideMap() {
     }
 }
 
+// Функция переключения между иконкой и фото
+function toggleImage(card) {
+    const cardImage = card.querySelector('.card-image');
+    const placeholder = cardImage.querySelector('.image-placeholder');
+    const realImage = cardImage.querySelector('.real-image');
+    const toggleBtn = cardImage.querySelector('.toggle-image-btn');
+    
+    if (realImage.classList.contains('active')) {
+        // Возвращаем иконку
+        realImage.classList.remove('active');
+        placeholder.classList.remove('hidden');
+        toggleBtn.innerHTML = '<i class="fas fa-camera"></i> Фото';
+    } else {
+        // Показываем фото
+        const placeName = card.querySelector('.card-title').textContent;
+        const images = placeImages[placeName];
+        
+        if (images && images.length > 0) {
+            // Устанавливаем первое изображение
+            realImage.style.backgroundImage = `url(${images[0]})`;
+            realImage.classList.add('active');
+            placeholder.classList.add('hidden');
+            toggleBtn.innerHTML = '<i class="fas fa-palette"></i> Иконка';
+        } else {
+            showNotification('Фотографии для этого заведения скоро появятся! 📸', 'error');
+        }
+    }
+}
+
+// Функция показа полноэкранного изображения
+function showFullscreenImage(placeName) {
+    const images = placeImages[placeName];
+    if (!images || images.length === 0) {
+        showNotification('Фотографии для этого заведения скоро появятся! 📸', 'error');
+        return;
+    }
+    
+    fullscreenImage.src = images[0];
+    imageModalTitle.textContent = placeName;
+    imageModal.classList.add('show');
+    document.body.style.overflow = 'hidden';
+}
+
+// Функция скрытия полноэкранного изображения
+function hideFullscreenImage() {
+    imageModal.classList.remove('show');
+    document.body.style.overflow = 'auto';
+    fullscreenImage.src = '';
+}
+
 // Анимации карточек
 function initCardAnimations() {
     const observerOptions = {
@@ -385,22 +485,55 @@ logoutBtn.addEventListener('click', logout);
 
 closeMapModal.addEventListener('click', hideMap);
 
-// Закрытие модального окна при клике вне его
+closeImageModal.addEventListener('click', hideFullscreenImage);
+
+// Закрытие модальных окон при клике вне их
 mapModal.addEventListener('click', (e) => {
     if (e.target === mapModal) {
         hideMap();
     }
 });
 
-// Закрытие модального окна по ESC
+imageModal.addEventListener('click', (e) => {
+    if (e.target === imageModal) {
+        hideFullscreenImage();
+    }
+});
+
+// Закрытие модальных окон по ESC
 document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && mapModal.classList.contains('show')) {
-        hideMap();
+    if (e.key === 'Escape') {
+        if (mapModal.classList.contains('show')) {
+            hideMap();
+        }
+        if (imageModal.classList.contains('show')) {
+            hideFullscreenImage();
+        }
     }
 });
 
 // Обработчики для кнопок действий
 document.addEventListener('click', (e) => {
+    // Кнопка переключения фото/иконки
+    if (e.target.classList.contains('toggle-image-btn') || 
+        e.target.closest('.toggle-image-btn')) {
+        const btn = e.target.classList.contains('toggle-image-btn') ? 
+                   e.target : e.target.closest('.toggle-image-btn');
+        const card = btn.closest('.place-card');
+        toggleImage(card);
+    }
+    
+    // Кнопка развернуть фото
+    if (e.target.classList.contains('expand-image-btn') || 
+        e.target.closest('.expand-image-btn')) {
+        const btn = e.target.classList.contains('expand-image-btn') ? 
+                   e.target : e.target.closest('.expand-image-btn');
+        const card = btn.closest('.place-card');
+        const placeName = card.querySelector('.card-title').textContent;
+        showFullscreenImage(placeName);
+    }
+    
+    // Остальные кнопки действий
     if (e.target.classList.contains('action-btn') || 
         e.target.closest('.action-btn')) {
         const btn = e.target.classList.contains('action-btn') ? e.target : e.target.closest('.action-btn');
