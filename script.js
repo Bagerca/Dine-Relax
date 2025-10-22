@@ -43,6 +43,17 @@ const userRole = document.getElementById('user-role');
 const welcomeName = document.getElementById('welcome-name');
 const logoutBtn = document.getElementById('logout-btn');
 
+// Проверяем, авторизован ли пользователь при загрузке
+window.addEventListener('load', () => {
+    const savedUser = localStorage.getItem('currentUser');
+    if (savedUser) {
+        const user = JSON.parse(savedUser);
+        showMainContent(user);
+    } else {
+        accessKeyInput.focus();
+    }
+});
+
 // Функция для показа уведомлений
 function showNotification(message, type = 'success') {
     // Удаляем предыдущие уведомления
@@ -73,6 +84,31 @@ function showNotification(message, type = 'success') {
     }, 3000);
 }
 
+// Функция показа основного контента
+function showMainContent(user) {
+    // Обновляем приветствие
+    welcomeName.textContent = user.name.split(' ')[0];
+    
+    // Переходим на главный экран
+    loginScreen.style.display = 'none';
+    mainContent.style.display = 'block';
+    
+    // Показываем приветствие
+    if (user.role === 'Владелец сайта') {
+        showNotification('Добро пожаловать, создатель! 🎉 Ваш сайт выглядит премиально!');
+    } else if (user.role === 'Учитель') {
+        showNotification('Здравствуйте, Лариса Кадыровна! 👩‍🏫 Добро пожаловать!');
+    } else {
+        showNotification(`Добро пожаловать, ${user.name.split(' ')[0]}! ✨ Наслаждайтесь эксклюзивным контентом`);
+    }
+
+    // Прокрутка к началу контента
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    // Запускаем анимации карточек
+    setTimeout(initCardAnimations, 500);
+}
+
 // Функция входа
 function login() {
     const key = accessKeyInput.value.trim().toUpperCase();
@@ -98,24 +134,11 @@ function login() {
             
             // Дополнительная задержка для плавного перехода
             setTimeout(() => {
-                // Обновляем приветствие
-                welcomeName.textContent = user.name.split(' ')[0];
+                // Сохраняем пользователя в localStorage
+                localStorage.setItem('currentUser', JSON.stringify(user));
                 
-                // Переходим на главный экран
-                loginScreen.classList.remove('active');
-                mainContent.classList.add('active');
-                
-                // Показываем приветствие
-                if (user.role === 'Владелец сайта') {
-                    showNotification('Добро пожаловать, создатель! 🎉 Ваш сайт выглядит премиально!');
-                } else if (user.role === 'Учитель') {
-                    showNotification('Здравствуйте, Лариса Кадыровна! 👩‍🏫 Добро пожаловать!');
-                } else {
-                    showNotification(`Добро пожаловать, ${user.name.split(' ')[0]}! ✨ Наслаждайтесь эксклюзивным контентом`);
-                }
-
-                // Прокрутка к началу контента
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                // Показываем основной контент
+                showMainContent(user);
             }, 800);
             
         } else {
@@ -134,12 +157,19 @@ function login() {
 
 // Функция выхода
 function logout() {
-    mainContent.classList.remove('active');
-    loginScreen.classList.add('active');
+    // Удаляем пользователя из localStorage
+    localStorage.removeItem('currentUser');
     
     // Сбрасываем форму
     accessKeyInput.value = '';
     userInfo.classList.remove('show');
+    
+    // Возвращаемся к экрану входа
+    mainContent.style.display = 'none';
+    loginScreen.style.display = 'flex';
+    
+    // Фокусируемся на input
+    accessKeyInput.focus();
     
     showNotification('Вы вышли из системы. Возвращайтесь скорее! 👋');
 }
@@ -166,38 +196,30 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
-// Фокусируем input при загрузке
-window.addEventListener('load', () => {
-    accessKeyInput.focus();
-});
+// Анимации карточек
+function initCardAnimations() {
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
 
-// Анимация появления карточек при скролле
-const observerOptions = {
-    threshold: 0.1,
-    rootMargin: '0px 0px -50px 0px'
-};
-
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.style.opacity = '1';
-            entry.target.style.transform = 'translateY(0)';
-        }
-    });
-}, observerOptions);
-
-// Наблюдаем за карточками после загрузки контента
-document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(() => {
-        const cards = document.querySelectorAll('.place-card');
-        cards.forEach((card, index) => {
-            card.style.opacity = '0';
-            card.style.transform = 'translateY(30px)';
-            card.style.transition = `all 0.6s cubic-bezier(0.4, 0, 0.2, 1) ${index * 0.1}s`;
-            observer.observe(card);
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
         });
-    }, 100);
-});
+    }, observerOptions);
+
+    const cards = document.querySelectorAll('.place-card');
+    cards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(30px)';
+        card.style.transition = `all 0.6s cubic-bezier(0.4, 0, 0.2, 1) ${index * 0.1}s`;
+        observer.observe(card);
+    });
+}
 
 // Обработчики для кнопок действий
 document.addEventListener('click', (e) => {
