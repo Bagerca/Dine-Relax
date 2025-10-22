@@ -143,6 +143,10 @@
                                         <i class="fas fa-map-marker-alt"></i>
                                         На карте
                                     </button>
+                                    <button class="vote-btn">
+                                        <i class="fas fa-vote-yea"></i>
+                                        Голосовать
+                                    </button>
                                     <button class="action-btn primary">
                                         <i class="fab fa-vk"></i>
                                         VK
@@ -202,6 +206,10 @@
                                     <button class="action-btn map-btn">
                                         <i class="fas fa-map-marker-alt"></i>
                                         На карте
+                                    </button>
+                                    <button class="vote-btn">
+                                        <i class="fas fa-vote-yea"></i>
+                                        Голосовать
                                     </button>
                                     <button class="action-btn primary">
                                         <i class="fab fa-vk"></i>
@@ -272,6 +280,10 @@
                                         <i class="fas fa-map-marker-alt"></i>
                                         На карте
                                     </button>
+                                    <button class="vote-btn">
+                                        <i class="fas fa-vote-yea"></i>
+                                        Голосовать
+                                    </button>
                                     <button class="action-btn primary">
                                         <i class="fas fa-globe"></i>
                                         Сайт
@@ -332,6 +344,10 @@
                                         <i class="fas fa-map-marker-alt"></i>
                                         На карте
                                     </button>
+                                    <button class="vote-btn">
+                                        <i class="fas fa-vote-yea"></i>
+                                        Голосовать
+                                    </button>
                                     <button class="action-btn primary">
                                         <i class="fas fa-globe"></i>
                                         Сайт
@@ -391,6 +407,10 @@
                                     <button class="action-btn map-btn">
                                         <i class="fas fa-map-marker-alt"></i>
                                         На карте
+                                    </button>
+                                    <button class="vote-btn">
+                                        <i class="fas fa-vote-yea"></i>
+                                        Голосовать
                                     </button>
                                     <button class="action-btn primary">
                                         <i class="fas fa-phone"></i>
@@ -463,6 +483,10 @@
                                     <button class="action-btn map-btn">
                                         <i class="fas fa-map-marker-alt"></i>
                                         На карте
+                                    </button>
+                                    <button class="vote-btn">
+                                        <i class="fas fa-vote-yea"></i>
+                                        Голосовать
                                     </button>
                                     <button class="action-btn primary">
                                         <i class="fas fa-globe"></i>
@@ -538,12 +562,59 @@
                                         <i class="fas fa-map-marker-alt"></i>
                                         На карте
                                     </button>
+                                    <button class="vote-btn">
+                                        <i class="fas fa-vote-yea"></i>
+                                        Голосовать
+                                    </button>
                                     <button class="action-btn primary">
                                         <i class="fas fa-globe"></i>
                                         Сайт
                                     </button>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Секция голосования -->
+                <section class="voting-section" id="voting-section">
+                    <div class="voting-container">
+                        <div class="voting-header">
+                            <h2>Голосование за лучшие места</h2>
+                            <p>Выберите ваши любимые заведения и посмотрите на предпочтения класса</p>
+                            <div class="section-line"></div>
+                        </div>
+                        
+                        <div class="voting-stats">
+                            <div class="chart-container">
+                                <div class="chart-header">
+                                    <div class="chart-title">Результаты голосования</div>
+                                    <div class="total-votes">
+                                        <i class="fas fa-chart-bar"></i>
+                                        Всего голосов: <span id="total-votes-count">0</span>
+                                    </div>
+                                </div>
+                                <div class="chart-wrapper">
+                                    <canvas id="votes-chart"></canvas>
+                                </div>
+                            </div>
+                            
+                            <div class="votes-list-container">
+                                <div class="votes-list-header">
+                                    <div class="votes-list-title">Голоса участников</div>
+                                    <input type="text" id="votes-search" class="votes-search" placeholder="Поиск по имени или месту...">
+                                </div>
+                                <div class="votes-list" id="votes-list">
+                                    <!-- Список будет заполнен JavaScript -->
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="text-align: center; margin-top: 2rem;">
+                            <p style="color: var(--text-secondary);">
+                                <i class="fas fa-info-circle"></i>
+                                Нажмите "Голосовать" на карточке заведения или используйте кнопку "Изменить" в списке выше
+                            </p>
                         </div>
                     </div>
                 </section>
