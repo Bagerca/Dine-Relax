@@ -122,32 +122,36 @@ const placesData = {
 // Данные с изображениями для каждого заведения
 const placeImages = {
     'Кофейня «Veranda»': [
-        'https://avatars.mds.yandex.net/get-altay/14014620/2a000001912c9dca1b4e62d778d484446b94/XXXL',
-        'https://avatars.mds.yandex.net/get-altay/1579247/2a0000017002698aef0ce1fbcd1c71d55787/XXXL'
+        'https://example.com/veranda-interior.jpg',
+        'https://example.com/veranda-coffee.jpg',
+        'https://example.com/veranda-desserts.jpg'
     ],
     'Кафе-пекарня «Мой Сосновый Бор»': [
-        'https://example.com/moy-sbor1.jpg',
-        'https://example.com/moy-sbor2.jpg'
+        'https://example.com/moy-sbor-interior.jpg',
+        'https://example.com/moy-sbor-bakery.jpg'
     ],
     'Ресторан «ПхалиХинкали»': [
-        'https://example.com/phali1.jpg',
-        'https://example.com/phali2.jpg'
+        'https://example.com/phali-dishes.jpg',
+        'https://example.com/phali-interior.jpg',
+        'https://example.com/phali-hinkali.jpg'
     ],
     'Ресторан «Токио-Сити»': [
-        'https://example.com/tokyo1.jpg',
-        'https://example.com/tokyo2.jpg'
+        'https://example.com/tokyo-interior.jpg',
+        'https://example.com/tokyo-sushi.jpg'
     ],
     'Гранд-кафе «Багратион»': [
-        'https://example.com/bagration1.jpg',
-        'https://example.com/bagration2.jpg'
+        'https://example.com/bagration-hall.jpg',
+        'https://example.com/bagration-food.jpg'
     ],
     'Гастробар «Хеваа»': [
-        'https://example.com/hevaa1.jpg',
-        'https://example.com/hevaa2.jpg'
+        'https://example.com/hevaa-terrace.jpg',
+        'https://example.com/hevaa-grill.jpg',
+        'https://example.com/hevaa-cocktails.jpg'
     ],
     'Кинотеатр «Современник»': [
-        'https://example.com/sovremennik1.jpg',
-        'https://example.com/sovremennik2.jpg'
+        'https://example.com/sovremennik-building.jpg',
+        'https://example.com/sovremennik-hall.jpg',
+        'https://example.com/sovremennik-bar.jpg'
     ]
 };
 
@@ -175,6 +179,15 @@ const imageModal = document.getElementById('image-modal');
 const fullscreenImage = document.getElementById('fullscreen-image');
 const imageModalTitle = document.getElementById('image-modal-title');
 const closeImageModal = document.getElementById('close-image-modal');
+const prevImageBtn = document.getElementById('prev-image');
+const nextImageBtn = document.getElementById('next-image');
+const currentImageElement = document.getElementById('current-image');
+const totalImagesElement = document.getElementById('total-images');
+
+// Переменные для управления изображениями
+let currentImages = [];
+let currentImageIndex = 0;
+let currentPlaceName = '';
 
 // Переменная для хранения карты
 let ymap = null;
@@ -426,7 +439,7 @@ function toggleImage(card) {
     }
 }
 
-// Функция показа полноэкранного изображения
+// Функция показа полноэкранного изображения с возможностью перелистывания
 function showFullscreenImage(placeName) {
     const images = placeImages[placeName];
     if (!images || images.length === 0) {
@@ -434,10 +447,49 @@ function showFullscreenImage(placeName) {
         return;
     }
     
-    fullscreenImage.src = images[0];
-    imageModalTitle.textContent = placeName;
+    currentImages = images;
+    currentImageIndex = 0;
+    currentPlaceName = placeName;
+    
+    updateFullscreenImage();
     imageModal.classList.add('show');
     document.body.style.overflow = 'hidden';
+}
+
+// Функция обновления полноэкранного изображения
+function updateFullscreenImage() {
+    if (currentImages.length === 0) return;
+    
+    fullscreenImage.src = currentImages[currentImageIndex];
+    imageModalTitle.textContent = currentPlaceName;
+    
+    // Обновляем счетчик
+    currentImageElement.textContent = currentImageIndex + 1;
+    totalImagesElement.textContent = currentImages.length;
+    
+    // Показываем/скрываем кнопки навигации
+    prevImageBtn.classList.toggle('hidden', currentImages.length <= 1);
+    nextImageBtn.classList.toggle('hidden', currentImages.length <= 1);
+    
+    // Скрываем счетчик если только одно изображение
+    document.querySelector('.image-counter').style.display = 
+        currentImages.length <= 1 ? 'none' : 'block';
+}
+
+// Функция перехода к следующему изображению
+function nextImage() {
+    if (currentImages.length <= 1) return;
+    
+    currentImageIndex = (currentImageIndex + 1) % currentImages.length;
+    updateFullscreenImage();
+}
+
+// Функция перехода к предыдущему изображению
+function prevImage() {
+    if (currentImages.length <= 1) return;
+    
+    currentImageIndex = (currentImageIndex - 1 + currentImages.length) % currentImages.length;
+    updateFullscreenImage();
 }
 
 // Функция скрытия полноэкранного изображения
@@ -445,6 +497,8 @@ function hideFullscreenImage() {
     imageModal.classList.remove('show');
     document.body.style.overflow = 'auto';
     fullscreenImage.src = '';
+    currentImages = [];
+    currentImageIndex = 0;
 }
 
 // Анимации карточек
@@ -487,6 +541,9 @@ closeMapModal.addEventListener('click', hideMap);
 
 closeImageModal.addEventListener('click', hideFullscreenImage);
 
+prevImageBtn.addEventListener('click', prevImage);
+nextImageBtn.addEventListener('click', nextImage);
+
 // Закрытие модальных окон при клике вне их
 mapModal.addEventListener('click', (e) => {
     if (e.target === mapModal) {
@@ -500,7 +557,7 @@ imageModal.addEventListener('click', (e) => {
     }
 });
 
-// Закрытие модальных окон по ESC
+// Закрытие модальных окон по ESC и навигация по изображениям
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
         if (mapModal.classList.contains('show')) {
@@ -508,6 +565,15 @@ document.addEventListener('keydown', (e) => {
         }
         if (imageModal.classList.contains('show')) {
             hideFullscreenImage();
+        }
+    }
+    
+    // Навигация по изображениям с помощью клавиш
+    if (imageModal.classList.contains('show')) {
+        if (e.key === 'ArrowLeft') {
+            prevImage();
+        } else if (e.key === 'ArrowRight') {
+            nextImage();
         }
     }
 });
@@ -523,7 +589,7 @@ document.addEventListener('click', (e) => {
         toggleImage(card);
     }
     
-    // Кнопка развернуть фото
+    // Кнопка развернуть фото (теперь в левом верхнем углу)
     if (e.target.classList.contains('expand-image-btn') || 
         e.target.closest('.expand-image-btn')) {
         const btn = e.target.classList.contains('expand-image-btn') ? 
