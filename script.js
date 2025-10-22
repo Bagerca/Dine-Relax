@@ -114,7 +114,7 @@ const placesData = {
         rating: 3.9,
         reviewsCount: 1000,
         price: '$$',
-        features: ['Суши-бар «Кин-но»', 'Удобные кресла', 'Хороший звук', 'Несколько залов', 'Японская кухня'],
+        features: ['Суши-бар «Кин-но»', 'Удобные кресла', 'Хороший звук', 'Несколько залов', 'Японская кухни'],
         social: 'sovremennik.sbor.net'
     }
 };
@@ -196,6 +196,78 @@ let currentPlace = null;
 // Система голосования
 let votingData = {};
 let currentUserKey = '';
+
+// ================== FIREBASE ФУНКЦИИ ==================
+
+// Загрузка данных голосования из Firebase
+function loadVotingDataFromFirebase() {
+    const votesRef = window.db.ref('votes');
+    votesRef.on('value', (snapshot) => {
+        const data = snapshot.val();
+        votingData = data || {};
+        renderVotingResults();
+        updateVoteButtons();
+    });
+}
+
+// Сохранение голоса в Firebase
+function saveVoteToFirebase(userKey, voteData) {
+    const updates = {};
+    updates['votes/' + userKey] = voteData;
+    return window.db.ref().update(updates);
+}
+
+// Обновленная функция голосования
+async function handleVote(placeName) {
+    if (!currentUserKey) {
+        showNotification('Для голосования необходимо войти в систему', 'error');
+        return;
+    }
+    
+    const currentUser = users[currentUserKey];
+    if (!currentUser) {
+        showNotification('Ошибка: пользователь не найден', 'error');
+        return;
+    }
+    
+    // Загружаем актуальные данные
+    await loadVotingDataFromFirebase();
+    
+    if (!votingData[currentUserKey]) {
+        votingData[currentUserKey] = {
+            name: currentUser.name,
+            role: currentUser.role,
+            avatar: currentUser.avatar,
+            votedFor: []
+        };
+    }
+    
+    const userVote = votingData[currentUserKey];
+    const hasVoted = userVote.votedFor.includes(placeName);
+    
+    if (hasVoted) {
+        userVote.votedFor = userVote.votedFor.filter(place => place !== placeName);
+        showNotification(`Голос за "${placeName}" отменен`, 'success');
+    } else {
+        userVote.votedFor.push(placeName);
+        showNotification(`Вы проголосовали за "${placeName}"! 👍`, 'success');
+    }
+    
+    // Сохраняем в Firebase
+    const success = await saveVoteToFirebase(currentUserKey, userVote);
+    if (success) {
+        // Данные автоматически обновятся через слушатель в loadVotingDataFromFirebase
+    }
+}
+
+// Обновленная инициализация системы голосования
+function initVotingSystem() {
+    loadVotingDataFromFirebase(); // Используем Firebase вместо localStorage
+    setupVotingButtons();
+    setupVotesSearch();
+}
+
+// ================== ОСНОВНЫЕ ФУНКЦИИ ==================
 
 // Проверяем, авторизован ли пользователь при загрузке
 window.addEventListener('load', () => {
@@ -554,33 +626,6 @@ function initCardAnimations() {
 
 // СИСТЕМА ГОЛОСОВАНИЯ
 
-// Инициализация системы голосования
-function initVotingSystem() {
-    loadVotingData();
-    setupVotingButtons();
-    renderVotingResults();
-}
-
-// Загрузка данных голосования
-function loadVotingData() {
-    const saved = localStorage.getItem('sborVotingData');
-    if (saved) {
-        votingData = JSON.parse(saved);
-    }
-    
-    // Получаем текущего пользователя
-    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-    if (currentUser && currentUser.key) {
-        currentUserKey = currentUser.key;
-    }
-}
-
-// Сохранение данных голосования
-function saveVotingData() {
-    localStorage.setItem('sborVotingData', JSON.stringify(votingData));
-    renderVotingResults();
-}
-
 // Настройка кнопок голосования
 function setupVotingButtons() {
     document.addEventListener('click', (e) => {
@@ -596,46 +641,6 @@ function setupVotingButtons() {
             showVotingModal();
         }
     });
-}
-
-// Обработка голоса
-function handleVote(placeName) {
-    if (!currentUserKey) {
-        showNotification('Для голосования необходимо войти в систему', 'error');
-        return;
-    }
-    
-    const currentUser = users[currentUserKey];
-    if (!currentUser) {
-        showNotification('Ошибка: пользователь не найден', 'error');
-        return;
-    }
-    
-    // Инициализируем запись пользователя если её нет
-    if (!votingData[currentUserKey]) {
-        votingData[currentUserKey] = {
-            name: currentUser.name,
-            role: currentUser.role,
-            avatar: currentUser.avatar,
-            votedFor: []
-        };
-    }
-    
-    const userVote = votingData[currentUserKey];
-    const hasVoted = userVote.votedFor.includes(placeName);
-    
-    if (hasVoted) {
-        // Убираем голос
-        userVote.votedFor = userVote.votedFor.filter(place => place !== placeName);
-        showNotification(`Голос за "${placeName}" отменен`, 'success');
-    } else {
-        // Добавляем голос
-        userVote.votedFor.push(placeName);
-        showNotification(`Вы проголосовали за "${placeName}"! 👍`, 'success');
-    }
-    
-    saveVotingData();
-    updateVoteButtons();
 }
 
 // Обновление кнопок голосования
@@ -881,7 +886,9 @@ function saveVotesFromModal() {
     }
     
     votingData[currentUserKey].votedFor = selectedPlaces;
-    saveVotingData();
+    
+    // Сохраняем в Firebase
+    saveVoteToFirebase(currentUserKey, votingData[currentUserKey]);
     hideVotingModal();
     showNotification('Ваши голоса сохранены! 🗳️', 'success');
 }
@@ -1017,20 +1024,14 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
-// Авто-обновление результатов каждые 10 секунд
-setInterval(() => {
-    if (document.getElementById('voting-section')) {
-        loadVotingData();
-        renderVotingResults();
-        updateVoteButtons();
-    }
-}, 10000);
+// Удаляем старый интервал авто-обновления, так как Firebase обновляет в реальном времени
+// Вместо этого используем слушатель Firebase в loadVotingDataFromFirebase
 
 // Показ уведомления о новом голосовании
 window.addEventListener('storage', (e) => {
     if (e.key === 'sborVotingData') {
         showNotification('Результаты голосования обновлены! 🔄', 'success');
-        loadVotingData();
+        loadVotingDataFromFirebase();
         renderVotingResults();
         updateVoteButtons();
     }
@@ -1047,7 +1048,7 @@ Object.keys(placesData).forEach(place => {
     console.log(`   📍 ${place} - ${placesData[place].address}`);
 });
 console.log('');
-console.log('🗳️ Система голосования активирована!');
+console.log('🗳️ Система голосования с Firebase активирована!');
 console.log('Доступные команды:');
 console.log('   - showVotingModal() - открыть окно выбора голосов');
 console.log('   - renderVotingResults() - перерисовать результаты');
