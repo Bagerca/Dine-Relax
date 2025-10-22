@@ -55,30 +55,16 @@ function showNotification(message, type = 'success') {
     notification.className = `notification ${type}`;
     notification.textContent = message;
     
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 1rem 1.5rem;
-        background: ${type === 'error' ? '#e53e3e' : '#38a169'};
-        color: white;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        z-index: 1000;
-        transform: translateX(100%);
-        transition: transform 0.3s ease;
-    `;
-
     document.body.appendChild(notification);
 
     // Анимация появления
     setTimeout(() => {
-        notification.style.transform = 'translateX(0)';
+        notification.classList.add('show');
     }, 100);
 
     // Автоматическое скрытие
     setTimeout(() => {
-        notification.style.transform = 'translateX(100%)';
+        notification.classList.remove('show');
         setTimeout(() => {
             if (notification.parentNode) {
                 notification.parentNode.removeChild(notification);
@@ -121,13 +107,16 @@ function login() {
                 
                 // Показываем приветствие
                 if (user.role === 'Владелец сайта') {
-                    showNotification('Добро пожаловать, создатель! 🎉');
+                    showNotification('Добро пожаловать, создатель! 🎉 Ваш сайт выглядит премиально!');
                 } else if (user.role === 'Учитель') {
-                    showNotification('Здравствуйте, Лариса Кадыровна! 👩‍🏫');
+                    showNotification('Здравствуйте, Лариса Кадыровна! 👩‍🏫 Добро пожаловать!');
                 } else {
-                    showNotification(`Добро пожаловать, ${user.name.split(' ')[0]}! ✨`);
+                    showNotification(`Добро пожаловать, ${user.name.split(' ')[0]}! ✨ Наслаждайтесь эксклюзивным контентом`);
                 }
-            }, 500);
+
+                // Прокрутка к началу контента
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }, 800);
             
         } else {
             showNotification('Неверный ключ доступа', 'error');
@@ -140,7 +129,7 @@ function login() {
         
         // Скрываем загрузку
         loginBtn.classList.remove('loading');
-    }, 1000);
+    }, 1200);
 }
 
 // Функция выхода
@@ -152,7 +141,7 @@ function logout() {
     accessKeyInput.value = '';
     userInfo.classList.remove('show');
     
-    showNotification('Вы вышли из системы');
+    showNotification('Вы вышли из системы. Возвращайтесь скорее! 👋');
 }
 
 // Обработчики событий
@@ -182,11 +171,45 @@ window.addEventListener('load', () => {
     accessKeyInput.focus();
 });
 
-// Консольная информация для отладки
-console.log('🚀 Доступные ключи для тестирования:');
-Object.keys(users).forEach(key => {
-    console.log(`🔑 ${key} - ${users[key].name} (${users[key].role})`);
+// Плавная прокрутка для индикатора
+document.querySelector('.scroll-indicator').addEventListener('click', () => {
+    document.querySelector('.places-grid').scrollIntoView({ 
+        behavior: 'smooth' 
+    });
 });
+
+// Анимация появления карточек при скролле
+const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+};
+
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.style.opacity = '1';
+            entry.target.style.transform = 'translateY(0)';
+        }
+    });
+}, observerOptions);
+
+// Наблюдаем за карточками после загрузки контента
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+        const cards = document.querySelectorAll('.place-card');
+        cards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(30px)';
+            card.style.transition = `all 0.6s cubic-bezier(0.4, 0, 0.2, 1) ${index * 0.1}s`;
+            observer.observe(card);
+        });
+    }, 100);
+});
+
+// Консольная информация для отладки
+console.log('🌲 Премиум гид Сосновый Бор - Доступные ключи:');
 console.log('⭐ Особые ключи:');
 console.log('   B4G5R6T7 - Бебия Баграт (Владелец сайта)');
 console.log('   L1A2R3I4 - Албаева Лариса Кадыровна (Учитель)');
+console.log('');
+console.log('🍽️ Доступные места: Веранда, Хева, Пхали Хинкали, Токио Сити, База отдыха Сосновый Бор');
