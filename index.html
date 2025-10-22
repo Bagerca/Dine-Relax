@@ -682,6 +682,26 @@
         </div>
     </div>
 
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCZaC4Cldof7RTU32ofooWXH3twRLzaOw0",
+            authDomain: "sosnovy-bor-voting.firebaseapp.com",
+            databaseURL: "https://sosnovy-bor-voting-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "sosnovy-bor-voting",
+            storageBucket: "sosnovy-bor-voting.firebasestorage.app",
+            messagingSenderId: "324000694729",
+            appId: "1:324000694729:web:4c73376d75cdb4e3d66818"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        window.db = firebase.database();
+    </script>
+
     <script src="script.js"></script>
 </body>
 </html>
