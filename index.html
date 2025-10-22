@@ -1,1 +1,73 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Guide Premium</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Экран входа -->
+        <div id="login-screen" class="login-screen">
+            <div class="login-card">
+                <div class="logo">
+                    <h1>Travel Guide</h1>
+                    <p>Premium Access</p>
+                </div>
+                
+                <div class="form-group">
+                    <input type="text" id="access-key" placeholder="Введите ваш ключ доступа" maxlength="8">
+                    <button id="login-btn" class="login-btn">
+                        <span>Войти</span>
+                        <div class="btn-loader"></div>
+                    </button>
+                </div>
 
+                <div class="user-info" id="user-info">
+                    <div class="avatar" id="user-avatar">?</div>
+                    <div class="user-details">
+                        <h3 id="user-name">Гость</h3>
+                        <p id="user-role">Введите ключ для доступа</p>
+                    </div>
+                </div>
+
+                <div class="hint">
+                    <p>💡 Ключ состоит из 8 символов (буквы и цифры)</p>
+                </div>
+            </div>
+
+            <!-- Анимированный фон -->
+            <div class="floating-elements">
+                <div class="float-element el-1">🏖️</div>
+                <div class="float-element el-2">🍽️</div>
+                <div class="float-element el-3">🏨</div>
+                <div class="float-element el-4">🌴</div>
+                <div class="float-element el-5">⛱️</div>
+            </div>
+        </div>
+
+        <!-- Основной контент (будет скрыт до входа) -->
+        <div id="main-content" class="main-content hidden">
+            <header class="main-header">
+                <div class="header-content">
+                    <h1>Добро пожаловать, <span id="welcome-name">Гость</span>!</h1>
+                    <p>Премиум гид по базам отдыха и ресторанам</p>
+                    <button id="logout-btn" class="logout-btn">Выйти</button>
+                </div>
+            </header>
+            
+            <main class="content">
+                <div class="placeholder">
+                    <h2>🚧 Контент в разработке</h2>
+                    <p>Скоро здесь появится полная информация о лучших местах для отдыха</p>
+                    <div class="construction">🏗️</div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
