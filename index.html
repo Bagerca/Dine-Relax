@@ -9,49 +9,42 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <div class="container">
+    <div class="app-container">
         <!-- Экран входа -->
-        <div id="login-screen" class="login-screen">
-            <div class="login-card">
-                <div class="logo">
-                    <div class="logo-icon">🌲</div>
-                    <h1>Сосновый Бор</h1>
-                    <p>Премиум Гид по городу</p>
-                </div>
-                
-                <div class="form-group">
-                    <input type="text" id="access-key" placeholder="Введите ваш ключ доступа" maxlength="8">
-                    <button id="login-btn" class="login-btn">
-                        <span>Войти в клуб</span>
-                        <div class="btn-loader"></div>
-                    </button>
-                </div>
+        <div id="login-screen" class="login-screen active">
+            <div class="login-container">
+                <div class="login-card">
+                    <div class="logo">
+                        <div class="logo-icon">🌲</div>
+                        <h1>Сосновый Бор</h1>
+                        <p>Премиум Гид по городу</p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <input type="text" id="access-key" placeholder="Введите ваш ключ доступа" maxlength="8">
+                        <button id="login-btn" class="login-btn">
+                            <span>Войти в клуб</span>
+                            <div class="btn-loader"></div>
+                        </button>
+                    </div>
 
-                <div class="user-info" id="user-info">
-                    <div class="avatar" id="user-avatar">?</div>
-                    <div class="user-details">
-                        <h3 id="user-name">Гость</h3>
-                        <p id="user-role">Введите ключ для доступа</p>
+                    <div class="user-info" id="user-info">
+                        <div class="avatar" id="user-avatar">?</div>
+                        <div class="user-details">
+                            <h3 id="user-name">Гость</h3>
+                            <p id="user-role">Введите ключ для доступа</p>
+                        </div>
+                    </div>
+
+                    <div class="hint">
+                        <p><i class="fas fa-key"></i> Ключ состоит из 8 символов</p>
                     </div>
                 </div>
-
-                <div class="hint">
-                    <p><i class="fas fa-key"></i> Ключ состоит из 8 символов</p>
-                </div>
-            </div>
-
-            <!-- Анимированный фон -->
-            <div class="floating-elements">
-                <div class="float-element el-1">🍽️</div>
-                <div class="float-element el-2">🏖️</div>
-                <div class="float-element el-3">🌲</div>
-                <div class="float-element el-4">🏨</div>
-                <div class="float-element el-5">🎣</div>
             </div>
         </div>
 
         <!-- Основной контент -->
-        <div id="main-content" class="main-content hidden">
+        <div id="main-content" class="main-content">
             <!-- Хедер -->
             <header class="main-header">
                 <nav class="navbar">
@@ -60,197 +53,294 @@
                         <span>Сосновый Бор</span>
                     </div>
                     <div class="nav-user">
+                        <span class="welcome-text">Добро пожаловать, </span>
                         <span id="welcome-name">Гость</span>
                         <button id="logout-btn" class="logout-btn">
                             <i class="fas fa-sign-out-alt"></i>
+                            Выйти
                         </button>
                     </div>
                 </nav>
             </header>
 
-            <!-- Герой секция -->
-            <section class="hero">
-                <div class="hero-content">
-                    <h1>Премиум места <span class="accent-text">Соснового Бора</span></h1>
-                    <p>Эксклюзивный гид по лучшим заведениям города</p>
-                </div>
-                <div class="scroll-indicator">
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-            </section>
-
-            <!-- Сетка мест -->
-            <section class="places-grid">
-                <div class="section-header">
-                    <h2>Рестораны и Кафе</h2>
-                    <div class="section-line"></div>
-                </div>
-
-                <div class="places-container">
-                    <!-- Веранда -->
-                    <div class="place-card" data-category="restaurant">
-                        <div class="card-image">
-                            <div class="image-placeholder">
-                                <i class="fas fa-utensils"></i>
+            <!-- Основной контент -->
+            <main class="content-area">
+                <!-- Герой секция -->
+                <section class="hero-section">
+                    <div class="hero-content">
+                        <h1>Эксклюзивные места <span class="accent-text">Соснового Бора</span></h1>
+                        <p>Премиум-гид по лучшим заведениям нашего города</p>
+                        <div class="stats">
+                            <div class="stat-item">
+                                <span class="stat-number">5</span>
+                                <span class="stat-label">премиальных мест</span>
                             </div>
-                            <div class="card-badge premium">Премиум</div>
-                        </div>
-                        <div class="card-content">
-                            <h3 class="card-title">Веранда</h3>
-                            <p class="card-description">Элегантный ресторан с панорамным видом и европейской кухней</p>
-                            <div class="card-meta">
-                                <span class="rating">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star-half-alt"></i>
-                                </span>
-                                <span class="price">$$$</span>
-                            </div>
-                            <div class="card-features">
-                                <span class="feature"><i class="fas fa-wifi"></i> Wi-Fi</span>
-                                <span class="feature"><i class="fas fa-parking"></i> Парковка</span>
+                            <div class="stat-item">
+                                <span class="stat-number">26</span>
+                                <span class="stat-label">избранных гостей</span>
                             </div>
                         </div>
                     </div>
+                </section>
 
-                    <!-- Хева -->
-                    <div class="place-card" data-category="restaurant">
-                        <div class="card-image">
-                            <div class="image-placeholder" style="background: linear-gradient(135deg, #8B4513, #A0522D);">
-                                <i class="fas fa-fire"></i>
+                <!-- Кофейни -->
+                <section class="places-section">
+                    <div class="section-header">
+                        <h2>Кофейни</h2>
+                        <div class="section-line"></div>
+                    </div>
+
+                    <div class="places-grid">
+                        <!-- Veranda -->
+                        <div class="place-card">
+                            <div class="card-header">
+                                <div class="card-image">
+                                    <div class="image-placeholder coffee-bg">
+                                        <i class="fas fa-mug-hot"></i>
+                                    </div>
+                                    <div class="card-badge premium">Премиум</div>
+                                </div>
                             </div>
-                            <div class="card-badge popular">Популярное</div>
+                            <div class="card-content">
+                                <h3 class="card-title">Кофейня «Veranda»</h3>
+                                <p class="card-description">Элегантная кофейня с панорамным видом, авторским кофе и десертами ручной работы</p>
+                                <div class="card-meta">
+                                    <span class="rating">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star-half-alt"></i>
+                                        <span class="rating-text">4.7</span>
+                                    </span>
+                                    <span class="price">$$</span>
+                                </div>
+                                <div class="card-features">
+                                    <span class="feature"><i class="fas fa-wifi"></i> Wi-Fi</span>
+                                    <span class="feature"><i class="fas fa-parking"></i> Парковка</span>
+                                    <span class="feature"><i class="fas fa-utensils"></i> Терраса</span>
+                                </div>
+                                <div class="card-actions">
+                                    <button class="action-btn">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        На карте
+                                    </button>
+                                    <button class="action-btn primary">
+                                        <i class="fas fa-calendar"></i>
+                                        Забронировать
+                                    </button>
+                                </div>
+                            </div>
                         </div>
-                        <div class="card-content">
-                            <h3 class="card-title">Хева</h3>
-                            <p class="card-description">Кавказская кухня в аутентичной атмосфере с живой музыкой</p>
-                            <div class="card-meta">
-                                <span class="rating">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                </span>
-                                <span class="price">$$</span>
+
+                        <!-- Мой Сосновый Бор -->
+                        <div class="place-card">
+                            <div class="card-header">
+                                <div class="card-image">
+                                    <div class="image-placeholder cozy-bg">
+                                        <i class="fas fa-home"></i>
+                                    </div>
+                                    <div class="card-badge popular">Популярное</div>
+                                </div>
                             </div>
-                            <div class="card-features">
-                                <span class="feature"><i class="fas fa-music"></i> Живая музыка</span>
-                                <span class="feature"><i class="fas fa-utensils"></i> Терраса</span>
+                            <div class="card-content">
+                                <h3 class="card-title">Кофейня «Мой Сосновый Бор»</h3>
+                                <p class="card-description">Уютное место в центре города с домашней атмосферой и лучшим капучино в округе</p>
+                                <div class="card-meta">
+                                    <span class="rating">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="far fa-star"></i>
+                                        <span class="rating-text">4.3</span>
+                                    </span>
+                                    <span class="price">$</span>
+                                </div>
+                                <div class="card-features">
+                                    <span class="feature"><i class="fas fa-book"></i> Читальня</span>
+                                    <span class="feature"><i class="fas fa-couch"></i> Уютная зона</span>
+                                    <span class="feature"><i class="fas fa-music"></i> Фоновая музыка</span>
+                                </div>
+                                <div class="card-actions">
+                                    <button class="action-btn">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        На карте
+                                    </button>
+                                    <button class="action-btn primary">
+                                        <i class="fas fa-phone"></i>
+                                        Позвонить
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
+                </section>
 
-                    <!-- Пхали Хинкали -->
-                    <div class="place-card" data-category="restaurant">
-                        <div class="card-image">
-                            <div class="image-placeholder" style="background: linear-gradient(135deg, #D2691E, #CD853F);">
-                                <i class="fas fa-drumstick-bite"></i>
+                <!-- Рестораны -->
+                <section class="places-section">
+                    <div class="section-header">
+                        <h2>Рестораны</h2>
+                        <div class="section-line"></div>
+                    </div>
+
+                    <div class="places-grid">
+                        <!-- ПхалиХинкали -->
+                        <div class="place-card">
+                            <div class="card-header">
+                                <div class="card-image">
+                                    <div class="image-placeholder georgian-bg">
+                                        <i class="fas fa-drumstick-bite"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-content">
+                                <h3 class="card-title">Ресторан «ПхалиХинкали»</h3>
+                                <p class="card-description">Аутентичная грузинская кухня, живые национальные мелодии и хинкали ручной лепки</p>
+                                <div class="card-meta">
+                                    <span class="rating">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <span class="rating-text">5.0</span>
+                                    </span>
+                                    <span class="price">$$</span>
+                                </div>
+                                <div class="card-features">
+                                    <span class="feature"><i class="fas fa-music"></i> Живая музыка</span>
+                                    <span class="feature"><i class="fas fa-wine-bottle"></i> Винная карта</span>
+                                    <span class="feature"><i class="fas fa-utensils"></i> Терраса</span>
+                                </div>
+                                <div class="card-actions">
+                                    <button class="action-btn">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        На карте
+                                    </button>
+                                    <button class="action-btn primary">
+                                        <i class="fas fa-calendar"></i>
+                                        Столик
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                        <div class="card-content">
-                            <h3 class="card-title">Пхали Хинкали</h3>
-                            <p class="card-description">Лучшие хинкали и грузинские деликатесы в центре города</p>
-                            <div class="card-meta">
-                                <span class="rating">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="far fa-star"></i>
-                                </span>
-                                <span class="price">$</span>
+
+                        <!-- Токио-Сити -->
+                        <div class="place-card">
+                            <div class="card-header">
+                                <div class="card-image">
+                                    <div class="image-placeholder japanese-bg">
+                                        <i class="fas fa-fish"></i>
+                                    </div>
+                                    <div class="card-badge new">Новое</div>
+                                </div>
                             </div>
-                            <div class="card-features">
-                                <span class="feature"><i class="fas fa-home"></i> Уютная атмосфера</span>
-                                <span class="feature"><i class="fas fa-leaf"></i> Свежие продукты</span>
+                            <div class="card-content">
+                                <h3 class="card-title">Ресторан «Токио-Сити»</h3>
+                                <p class="card-description">Японская кухня премиум-класса, суши-бар с авторскими роллами и атмосфера Токио</p>
+                                <div class="card-meta">
+                                    <span class="rating">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star-half-alt"></i>
+                                        <span class="rating-text">4.6</span>
+                                    </span>
+                                    <span class="price">$$$</span>
+                                </div>
+                                <div class="card-features">
+                                    <span class="feature"><i class="fas fa-user-chef"></i> Шеф-повар</span>
+                                    <span class="feature"><i class="fas fa-truck"></i> Доставка</span>
+                                    <span class="feature"><i class="fas fa-couch"></i> Lounge</span>
+                                </div>
+                                <div class="card-actions">
+                                    <button class="action-btn">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        На карте
+                                    </button>
+                                    <button class="action-btn primary">
+                                        <i class="fas fa-bolt"></i>
+                                        Доставка
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
+                </section>
 
-                    <!-- Токио Сити -->
-                    <div class="place-card" data-category="restaurant">
-                        <div class="card-image">
-                            <div class="image-placeholder" style="background: linear-gradient(135deg, #2F4F4F, #708090);">
-                                <i class="fas fa-fish"></i>
+                <!-- Базы отдыха -->
+                <section class="places-section">
+                    <div class="section-header">
+                        <h2>Территории отдыха</h2>
+                        <div class="section-line"></div>
+                    </div>
+
+                    <div class="places-grid">
+                        <!-- Хеваа -->
+                        <div class="place-card featured">
+                            <div class="card-header">
+                                <div class="card-image">
+                                    <div class="image-placeholder resort-bg">
+                                        <i class="fas fa-umbrella-beach"></i>
+                                    </div>
+                                    <div class="card-badge exclusive">Эксклюзив</div>
+                                </div>
                             </div>
-                            <div class="card-badge new">Новое</div>
-                        </div>
-                        <div class="card-content">
-                            <h3 class="card-title">Токио Сити</h3>
-                            <p class="card-description">Японская кухня и суши-бар с авторскими роллами</p>
-                            <div class="card-meta">
-                                <span class="rating">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star-half-alt"></i>
-                                </span>
-                                <span class="price">$$</span>
-                            </div>
-                            <div class="card-features">
-                                <span class="feature"><i class="fas fa-couch"></i> Доставка</span>
-                                <span class="feature"><i class="fas fa-user-chef"></i> Шеф-повар из Японии</span>
+                            <div class="card-content">
+                                <h3 class="card-title">Территория отдыха «Хеваа»</h3>
+                                <p class="card-description">Премиальный комплекс на берегу Финского залива с частным пляжем, SPA и рестораном</p>
+                                <div class="card-meta">
+                                    <span class="rating">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <span class="rating-text">5.0</span>
+                                    </span>
+                                    <span class="price">$$$$</span>
+                                </div>
+                                <div class="card-features">
+                                    <span class="feature"><i class="fas fa-swimming-pool"></i> Бассейн</span>
+                                    <span class="feature"><i class="fas fa-spa"></i> SPA</span>
+                                    <span class="feature"><i class="fas fa-umbrella-beach"></i> Пляж</span>
+                                    <span class="feature"><i class="fas fa-fishing-rod"></i> Рыбалка</span>
+                                    <span class="feature"><i class="fas fa-hotel"></i> Отель</span>
+                                    <span class="feature"><i class="fas fa-utensils"></i> Ресторан</span>
+                                </div>
+                                <div class="card-actions">
+                                    <button class="action-btn">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        На карте
+                                    </button>
+                                    <button class="action-btn primary">
+                                        <i class="fas fa-calendar"></i>
+                                        Забронировать
+                                    </button>
+                                    <button class="action-btn">
+                                        <i class="fas fa-info"></i>
+                                        Подробнее
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </section>
-
-            <!-- Базы отдыха -->
-            <section class="places-grid">
-                <div class="section-header">
-                    <h2>Базы Отдыха</h2>
-                    <div class="section-line"></div>
-                </div>
-
-                <div class="places-container">
-                    <!-- Сосновый Бор -->
-                    <div class="place-card large" data-category="resort">
-                        <div class="card-image">
-                            <div class="image-placeholder" style="background: linear-gradient(135deg, #228B22, #32CD32);">
-                                <i class="fas fa-tree"></i>
-                            </div>
-                            <div class="card-badge exclusive">Эксклюзив</div>
-                        </div>
-                        <div class="card-content">
-                            <h3 class="card-title">База отдыха "Сосновый Бор"</h3>
-                            <p class="card-description">Премиальный комплекс на берегу Финского залива с собственным пляжем и SPA</p>
-                            <div class="card-meta">
-                                <span class="rating">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                </span>
-                                <span class="price">$$$$</span>
-                            </div>
-                            <div class="card-features">
-                                <span class="feature"><i class="fas fa-swimming-pool"></i> Бассейн</span>
-                                <span class="feature"><i class="fas fa-spa"></i> SPA</span>
-                                <span class="feature"><i class="fas fa-umbrella-beach"></i> Пляж</span>
-                                <span class="feature"><i class="fas fa-fishing-rod"></i> Рыбалка</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
+                </section>
+            </main>
 
             <!-- Футер -->
-            <footer class="footer">
+            <footer class="main-footer">
                 <div class="footer-content">
                     <div class="footer-brand">
                         <div class="logo-icon">🌲</div>
                         <span>Сосновый Бор Премиум</span>
                     </div>
-                    <p class="footer-text">Эксклюзивный гид для избранных</p>
+                    <p class="footer-text">Эксклюзивный гид для избранных гостей</p>
                     <div class="footer-info">
                         <span>© 2024 Все права защищены</span>
-                        <span>Только для класса 25 человек</span>
+                        <span>Только для класса 25 человек + учитель</span>
                     </div>
                 </div>
             </footer>
