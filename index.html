@@ -121,7 +121,7 @@
                                     <span class="feature"><i class="fas fa-utensils"></i> Терраса</span>
                                 </div>
                                 <div class="card-actions">
-                                    <button class="action-btn">
+                                    <button class="action-btn map-btn">
                                         <i class="fas fa-map-marker-alt"></i>
                                         На карте
                                     </button>
@@ -163,7 +163,7 @@
                                     <span class="feature"><i class="fas fa-music"></i> Фоновая музыка</span>
                                 </div>
                                 <div class="card-actions">
-                                    <button class="action-btn">
+                                    <button class="action-btn map-btn">
                                         <i class="fas fa-map-marker-alt"></i>
                                         На карте
                                     </button>
@@ -214,7 +214,7 @@
                                     <span class="feature"><i class="fas fa-utensils"></i> Терраса</span>
                                 </div>
                                 <div class="card-actions">
-                                    <button class="action-btn">
+                                    <button class="action-btn map-btn">
                                         <i class="fas fa-map-marker-alt"></i>
                                         На карте
                                     </button>
@@ -256,7 +256,7 @@
                                     <span class="feature"><i class="fas fa-couch"></i> Lounge</span>
                                 </div>
                                 <div class="card-actions">
-                                    <button class="action-btn">
+                                    <button class="action-btn map-btn">
                                         <i class="fas fa-map-marker-alt"></i>
                                         На карте
                                     </button>
@@ -311,7 +311,7 @@
                                     <span class="feature"><i class="fas fa-utensils"></i> Ресторан</span>
                                 </div>
                                 <div class="card-actions">
-                                    <button class="action-btn">
+                                    <button class="action-btn map-btn">
                                         <i class="fas fa-map-marker-alt"></i>
                                         На карте
                                     </button>
@@ -344,6 +344,23 @@
                     </div>
                 </div>
             </footer>
+        </div>
+    </div>
+
+    <!-- Модальное окно карты -->
+    <div id="map-modal" class="map-modal">
+        <div class="map-modal-content">
+            <div class="map-modal-header">
+                <h3 id="map-place-title">Название места</h3>
+                <button id="close-map-modal" class="close-map-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="map-container" class="map-container"></div>
+            <div class="map-address">
+                <i class="fas fa-map-marker-alt"></i>
+                <span id="map-address-text">Адрес будет загружен...</span>
+            </div>
         </div>
     </div>
 
