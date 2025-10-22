@@ -122,9 +122,9 @@ const placesData = {
 // Данные с изображениями для каждого заведения
 const placeImages = {
     'Кофейня «Veranda»': [
-        'https://example.com/veranda-interior.jpg',
-        'https://example.com/veranda-coffee.jpg',
-        'https://example.com/veranda-desserts.jpg'
+        'https://avatars.mds.yandex.net/get-altay/13054604/2a00000190a77560adb2066c2b0ff460732b/XXXL',
+        'https://avatars.mds.yandex.net/get-altay/14014620/2a000001912c9dca1b4e62d778d484446b94/XXXL',
+        'https://avatars.mds.yandex.net/get-altay/5456504/2a0000017c7ea8dd69a6f7b112b5640b870d/XXXL'
     ],
     'Кафе-пекарня «Мой Сосновый Бор»': [
         'https://example.com/moy-sbor-interior.jpg',
