@@ -299,6 +299,7 @@ body {
     padding: 1rem 2rem;
     max-width: 1400px;
     margin: 0 auto;
+    width: 100%;
 }
 
 .nav-brand {
@@ -312,24 +313,30 @@ body {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    margin: 0;
 }
 
 .nav-user {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 0.5rem;
     color: var(--text-primary);
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    margin: 0;
+    text-align: right;
+    white-space: nowrap;
 }
 
 .welcome-text {
     color: var(--text-secondary);
     font-size: 0.9rem;
+    margin: 0;
 }
 
 #welcome-name {
     font-weight: 600;
     color: var(--accent);
+    margin: 0;
 }
 
 .logout-btn {
