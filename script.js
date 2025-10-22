@@ -168,9 +168,24 @@ function showNotification(message, type = 'success') {
     }, 3000);
 }
 
+// Функция форматирования имени для приветствия
+function formatDisplayName(user) {
+    if (user.role === 'Учитель') {
+        return 'Лариса К.';
+    } else if (user.role === 'Владелец сайта') {
+        return 'Баграт';
+    } else {
+        const nameParts = user.name.split(' ');
+        const lastName = nameParts[0];
+        const firstNameInitial = nameParts[1] ? nameParts[1].charAt(0) + '.' : '';
+        return `${lastName} ${firstNameInitial}`;
+    }
+}
+
 // Функция показа основного контента
 function showMainContent(user) {
-    welcomeName.textContent = user.name.split(' ')[0];
+    const displayName = formatDisplayName(user);
+    welcomeName.textContent = displayName;
     
     loginScreen.style.display = 'none';
     mainContent.style.display = 'block';
@@ -180,7 +195,7 @@ function showMainContent(user) {
     } else if (user.role === 'Учитель') {
         showNotification('Здравствуйте, Лариса Кадыровна! 👩‍🏫 Добро пожаловать!');
     } else {
-        showNotification(`Добро пожаловать, ${user.name.split(' ')[0]}! ✨ Наслаждайтесь эксклюзивным контентом`);
+        showNotification(`Добро пожаловать, ${displayName}! ✨ Наслаждайтесь эксклюзивным контентом`);
     }
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
