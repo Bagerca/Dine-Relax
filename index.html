@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Сосновый Бор | Эксклюзив Гид</title>
+    <title>Сосновый Бор | Премиум Гид</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -589,9 +589,24 @@
             <button id="close-image-modal" class="close-image-btn">
                 <i class="fas fa-times"></i>
             </button>
+            
+            <!-- Кнопки перелистывания -->
+            <button id="prev-image" class="image-nav-btn prev-btn">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button id="next-image" class="image-nav-btn next-btn">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            
             <div class="image-modal-container">
                 <img id="fullscreen-image" src="" alt="Фото заведения">
             </div>
+            
+            <!-- Счетчик изображений -->
+            <div class="image-counter">
+                <span id="current-image">1</span> / <span id="total-images">1</span>
+            </div>
+            
             <div class="image-modal-title" id="image-modal-title">Название заведения</div>
         </div>
     </div>
