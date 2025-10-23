@@ -1171,7 +1171,7 @@ body {
 }
 
 .chart-wrapper {
-    height: 300px;
+    height: 400px; /* Фиксированная высота для вертикальной диаграммы */
     position: relative;
 }
 
@@ -1355,7 +1355,7 @@ body {
     75% { transform: translateX(5px); }
 }
 
-/* Стили для новой горизонтальной диаграммы */
+/* Стили для новой вертикальной диаграммы */
 .chart-wrapper {
     position: relative;
     overflow: hidden;
@@ -1367,13 +1367,13 @@ body {
 
 /* Анимация для баров диаграммы */
 @keyframes barGrowth {
-    from { transform: scaleX(0); }
-    to { transform: scaleX(1); }
+    from { transform: scaleY(0); }
+    to { transform: scaleY(1); }
 }
 
 .chart-bar {
     animation: barGrowth 0.8s ease-out;
-    transform-origin: left center;
+    transform-origin: bottom center;
 }
 
 /* Улучшение читаемости для диаграммы */
@@ -1408,7 +1408,7 @@ body {
     }
     
     .chart-wrapper {
-        height: 250px;
+        height: 350px;
     }
 }
 
@@ -1564,6 +1564,11 @@ body {
     .voting-options {
         max-height: 300px;
     }
+    
+    /* Адаптация вертикальной диаграммы для мобильных */
+    .chart-wrapper {
+        height: 300px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -1586,5 +1591,9 @@ body {
     .toggle-image-btn {
         font-size: 0.7rem;
         padding: 0.4rem 0.6rem;
+    }
+    
+    .chart-wrapper {
+        height: 250px;
     }
 }
