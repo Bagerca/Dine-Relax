@@ -382,7 +382,10 @@ function showNotification(message, type = 'success') {
 
 // Функция форматирования имени для приветствия
 function formatDisplayName(user) {
-    if (user.role === 'Учитель') {
+    // Специальное приветствие для Надьярной Елизаветы
+    if (user.key === 'E9L0I1Z2') {
+        return 'Спящая Красавица';
+    } else if (user.role === 'Учитель') {
         return 'Лариса К.';
     } else if (user.role === 'Владелец сайта') {
         return 'Баграт';
@@ -423,7 +426,10 @@ function showMainContent(user) {
     loginScreen.style.display = 'none';
     mainContent.style.display = 'block';
     
-    if (user.role === 'Владелец сайта') {
+    // Специальные приветствия
+    if (user.key === 'E9L0I1Z2') {
+        showNotification('Добро пожаловать, Спящая Красавица! 💫 Проснись и голосуй за любимые места!');
+    } else if (user.role === 'Владелец сайта') {
         showNotification('Добро пожаловать, создатель! 🎉 Ваш сайт выглядит премиально!');
     } else if (user.role === 'Учитель') {
         showNotification('Здравствуйте, Лариса Кадыровна! 👩‍🏫 Добро пожаловать!');
@@ -759,7 +765,7 @@ function renderVotingResults() {
     renderVotesList();
 }
 
-// Рендеринг диаграммы
+// Рендеринг диаграммы - НОВАЯ ВЕРСИЯ с горизонтальными барами
 function renderChart() {
     const canvas = document.getElementById('votes-chart');
     if (!canvas) {
@@ -796,7 +802,7 @@ function renderChart() {
     
     console.log('📊 Результаты подсчета:', voteCounts);
     
-    // Сортируем по количеству голосов
+    // Сортируем по количеству голосов (по убыванию)
     const sortedPlaces = Object.entries(voteCounts)
         .sort(([,a], [,b]) => b - a);
     
@@ -817,46 +823,86 @@ function renderChart() {
     }
     
     const maxVotes = Math.max(...Object.values(voteCounts));
-    const barWidth = (canvas.width - 100) / sortedPlaces.length;
-    const maxBarHeight = canvas.height - 120;
+    const barHeight = 40;
+    const barSpacing = 15;
+    const textMargin = 10;
+    const maxBarWidth = canvas.width - 200; // Оставляем место для текста
     
-    // Рисуем столбцы
+    // Фон для всей диаграммы
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.02)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Рисуем горизонтальные бары
     sortedPlaces.forEach(([place, votes], index) => {
-        const barHeight = (votes / maxVotes) * maxBarHeight;
-        const x = 50 + index * barWidth;
-        const y = canvas.height - 70 - barHeight;
+        const y = 50 + index * (barHeight + barSpacing);
+        const barWidth = (votes / maxVotes) * maxBarWidth;
         
-        // Градиент для столбца
-        const gradient = ctx.createLinearGradient(x, y, x, y + barHeight);
+        // Пропускаем если выходит за границы
+        if (y > canvas.height - 50) return;
+        
+        // Градиент для бара
+        const gradient = ctx.createLinearGradient(0, y, 0, y + barHeight);
         gradient.addColorStop(0, '#ff6b35');
         gradient.addColorStop(1, '#ff8c5a');
         
-        // Столбец
+        // Бар
         ctx.fillStyle = gradient;
-        ctx.fillRect(x, y, barWidth - 10, barHeight);
+        roundRect(ctx, 150, y, barWidth, barHeight, 8);
         
         // Тень
         ctx.shadowColor = 'rgba(255, 107, 53, 0.3)';
         ctx.shadowBlur = 10;
-        ctx.shadowOffsetY = 5;
-        ctx.fillRect(x, y, barWidth - 10, barHeight);
+        ctx.shadowOffsetX = 5;
+        roundRect(ctx, 150, y, barWidth, barHeight, 8);
         ctx.shadowColor = 'transparent';
+        
+        // Название места (сокращаем если длинное)
+        ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-primary');
+        ctx.font = '14px Inter';
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'middle';
+        
+        let displayName = place;
+        if (displayName.length > 20) {
+            displayName = displayName.substring(0, 20) + '...';
+        }
+        ctx.fillText(displayName, textMargin, y + barHeight / 2);
         
         // Количество голосов
         ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-primary');
-        ctx.font = 'bold 14px Inter';
-        ctx.textAlign = 'center';
-        ctx.fillText(votes, x + (barWidth - 10) / 2, y - 10);
+        ctx.font = 'bold 16px Inter';
+        ctx.textAlign = 'right';
+        ctx.fillText(votes, 140, y + barHeight / 2);
         
-        // Название места (сокращаем если длинное)
+        // Процент голосов
+        const percentage = totalVotes > 0 ? ((votes / totalVotes) * 100).toFixed(1) : 0;
         ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-secondary');
         ctx.font = '12px Inter';
-        let displayName = place;
-        if (displayName.length > 15) {
-            displayName = displayName.substring(0, 15) + '...';
-        }
-        ctx.fillText(displayName, x + (barWidth - 10) / 2, canvas.height - 40);
+        ctx.textAlign = 'left';
+        ctx.fillText(`${percentage}%`, 155 + barWidth + 5, y + barHeight / 2);
     });
+    
+    // Заголовок оси
+    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-muted');
+    ctx.font = '12px Inter';
+    ctx.textAlign = 'center';
+    ctx.fillText('Количество голосов →', canvas.width / 2, 30);
+}
+
+// Вспомогательная функция для скругленных прямоугольников
+function roundRect(ctx, x, y, width, height, radius) {
+    ctx.beginPath();
+    ctx.moveTo(x + radius, y);
+    ctx.lineTo(x + width - radius, y);
+    ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+    ctx.lineTo(x + width, y + height - radius);
+    ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+    ctx.lineTo(x + radius, y + height);
+    ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+    ctx.lineTo(x, y + radius);
+    ctx.quadraticCurveTo(x, y, x + radius, y);
+    ctx.closePath();
+    ctx.fill();
 }
 
 // Рендеринг списка голосов
@@ -1189,6 +1235,7 @@ console.log('🌲 Премиум гид Сосновый Бор - Доступн
 console.log('⭐ Особые ключи:');
 console.log('   B4G5R6T7 - Бебия Баграт (Владелец сайта)');
 console.log('   L1A2R3I4 - Албаева Лариса Кадыровна (Учитель)');
+console.log('   E9L0I1Z2 - Надьярная Елизавета (Спящая Красавица)');
 console.log('');
 console.log('🏪 Доступные места на карте:');
 Object.keys(placesData).forEach(place => {
