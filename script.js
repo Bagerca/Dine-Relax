@@ -337,6 +337,566 @@ function initVotingSystem() {
     setupVotesSearch();
 }
 
+// ================== ОБНОВЛЕННАЯ ДИАГРАММА ==================
+
+// Рендеринг диаграммы - ГОРИЗОНТАЛЬНАЯ ДИАГРАММА С НАЗВАНИЯМИ ВНУТРИ СТОЛБЦОВ
+function renderChart() {
+    const canvas = document.getElementById('votes-chart');
+    if (!canvas) {
+        console.log('❌ Canvas не найден');
+        return;
+    }
+    
+    const ctx = canvas.getContext('2d');
+    const container = canvas.parentElement;
+    
+    // Устанавливаем размеры canvas
+    canvas.width = container.clientWidth;
+    canvas.height = 400;
+    
+    // Очищаем canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    console.log('🎨 Рендерим горизонтальную диаграмму с votingData:', votingData);
+    
+    // Считаем голоса с защитой от ошибок
+    const voteCounts = {};
+    
+    if (votingData && typeof votingData === 'object') {
+        Object.values(votingData).forEach(user => {
+            if (user && Array.isArray(user.votedFor)) {
+                user.votedFor.forEach(place => {
+                    if (place) {
+                        voteCounts[place] = (voteCounts[place] || 0) + 1;
+                    }
+                });
+            }
+        });
+    }
+    
+    console.log('📊 Результаты подсчета:', voteCounts);
+    
+    // Сортируем по количеству голосов (по убыванию)
+    const sortedPlaces = Object.entries(voteCounts)
+        .sort(([,a], [,b]) => b - a);
+    
+    // Обновляем общее количество голосов
+    const totalVotes = Object.values(voteCounts).reduce((sum, count) => sum + count, 0);
+    const totalVotesElement = document.getElementById('total-votes-count');
+    if (totalVotesElement) {
+        totalVotesElement.textContent = totalVotes;
+    }
+    
+    if (sortedPlaces.length === 0) {
+        // Показываем сообщение когда нет голосов
+        ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-secondary');
+        ctx.font = '16px Inter';
+        ctx.textAlign = 'center';
+        ctx.fillText('Пока нет голосов. Будьте первым!', canvas.width / 2, canvas.height / 2);
+        return;
+    }
+    
+    const maxVotes = Math.max(...Object.values(voteCounts));
+    
+    // Настройки для горизонтальной диаграммы
+    const padding = { top: 60, right: 100, bottom: 60, left: 20 };
+    const chartWidth = canvas.width - padding.left - padding.right;
+    const chartHeight = canvas.height - padding.top - padding.bottom;
+    const barHeight = 35;
+    const barSpacing = 15;
+    
+    // Фон для всей диаграммы
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.02)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Рисуем горизонтальные бары
+    sortedPlaces.forEach(([place, votes], index) => {
+        const y = padding.top + index * (barHeight + barSpacing);
+        const barWidth = (votes / maxVotes) * chartWidth;
+        
+        // Градиент для бара
+        const gradient = ctx.createLinearGradient(padding.left, y, padding.left + barWidth, y);
+        gradient.addColorStop(0, '#ff6b35');
+        gradient.addColorStop(1, '#ff8c5a');
+        
+        // Бар
+        ctx.fillStyle = gradient;
+        roundRect(ctx, padding.left, y, barWidth, barHeight, 8);
+        
+        // Тень
+        ctx.shadowColor = 'rgba(255, 107, 53, 0.3)';
+        ctx.shadowBlur = 10;
+        ctx.shadowOffsetX = 5;
+        roundRect(ctx, padding.left, y, barWidth, barHeight, 8);
+        ctx.shadowColor = 'transparent';
+        
+        // Название места ВНУТРИ бара (слева)
+        const shortName = getShortPlaceName(place);
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold 14px Inter';
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'middle';
+        
+        // Обрезаем название если слишком длинное
+        let displayName = shortName;
+        const maxNameWidth = barWidth - 100; // Оставляем место для процентов
+        let textWidth = ctx.measureText(displayName).width;
+        
+        if (textWidth > maxNameWidth && barWidth > 150) {
+            // Постепенно укорачиваем название
+            while (textWidth > maxNameWidth && displayName.length > 10) {
+                displayName = displayName.substring(0, displayName.length - 1);
+                textWidth = ctx.measureText(displayName + '...').width;
+            }
+            displayName = displayName + '...';
+        }
+        
+        ctx.fillText(displayName, padding.left + 10, y + barHeight / 2);
+        
+        // Процент голосов ВНУТРИ бара (справа)
+        const percentage = totalVotes > 0 ? ((votes / totalVotes) * 100).toFixed(1) : 0;
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold 14px Inter';
+        ctx.textAlign = 'right';
+        
+        // Позиционируем проценты внутри бара, если достаточно места
+        if (barWidth > 120) {
+            ctx.fillText(`${percentage}%`, padding.left + barWidth - 10, y + barHeight / 2);
+        } else {
+            // Иначе рисуем справа от бара
+            ctx.fillText(`${percentage}%`, padding.left + barWidth + 40, y + barHeight / 2);
+        }
+        
+        // Количество голосов (под баром или справа)
+        ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-secondary');
+        ctx.font = '12px Inter';
+        ctx.textAlign = 'left';
+        
+        if (barWidth > 150) {
+            // Внутри бара под названием
+            ctx.fillText(`${votes} голосов`, padding.left + 10, y + barHeight + 15);
+        } else {
+            // Справа от бара
+            ctx.fillText(`${votes} голосов`, padding.left + barWidth + 10, y + barHeight / 2);
+        }
+    });
+    
+    // Ось X (количество голосов)
+    ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--border');
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(padding.left, padding.top);
+    ctx.lineTo(padding.left + chartWidth, padding.top);
+    ctx.stroke();
+    
+    // Засечки на оси X
+    for (let i = 0; i <= 5; i++) {
+        const x = padding.left + (i / 5) * chartWidth;
+        const value = Math.round((i / 5) * maxVotes);
+        
+        ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--border');
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(x, padding.top - 5);
+        ctx.lineTo(x, padding.top);
+        ctx.stroke();
+        
+        ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-secondary');
+        ctx.font = '12px Inter';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'bottom';
+        ctx.fillText(value, x, padding.top - 8);
+    }
+    
+    // Заголовок
+    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-primary');
+    ctx.font = 'bold 16px Inter';
+    ctx.textAlign = 'center';
+    ctx.fillText('Результаты голосования', canvas.width / 2, 30);
+}
+
+// Функция для получения короткого названия места (убираем "Кофейня", "Ресторан" и т.д.)
+function getShortPlaceName(fullName) {
+    // Убираем префиксы типа "Кофейня", "Ресторан", "Кафе-пекарня" и т.д.
+    const prefixes = [
+        'Кофейня',
+        'Ресторан', 
+        'Кафе-пекарня',
+        'Гранд-кафе',
+        'Гастробар',
+        'Кинотеатр',
+        'Кафе'
+    ];
+    
+    let shortName = fullName;
+    
+    // Убираем кавычки «»
+    shortName = shortName.replace(/«|»/g, '');
+    
+    // Убираем префиксы
+    for (const prefix of prefixes) {
+        if (shortName.startsWith(prefix)) {
+            shortName = shortName.substring(prefix.length).trim();
+            break;
+        }
+    }
+    
+    // Убираем лишние пробелы и возвращаем
+    return shortName.trim() || fullName;
+}
+
+// Вспомогательная функция для скругленных прямоугольников
+function roundRect(ctx, x, y, width, height, radius) {
+    ctx.beginPath();
+    ctx.moveTo(x + radius, y);
+    ctx.lineTo(x + width - radius, y);
+    ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+    ctx.lineTo(x + width, y + height - radius);
+    ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+    ctx.lineTo(x + radius, y + height);
+    ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+    ctx.lineTo(x, y + radius);
+    ctx.quadraticCurveTo(x, y, x + radius, y);
+    ctx.closePath();
+    ctx.fill();
+}
+
+// ================== СИСТЕМА УПРАВЛЕНИЯ КАРТОЧКАМИ ==================
+
+// Инициализация управления карточками для владельца
+function initCardManagement() {
+    const currentUser = users[currentUserKey];
+    if (currentUser && currentUser.role === 'Владелец сайта') {
+        addManagementInterface();
+    }
+}
+
+// Добавление интерфейса управления
+function addManagementInterface() {
+    // Добавляем кнопку управления в навбар
+    const navbar = document.querySelector('.navbar');
+    const manageBtn = document.createElement('button');
+    manageBtn.className = 'logout-btn management-btn';
+    manageBtn.innerHTML = '<i class="fas fa-plus"></i> Добавить место';
+    manageBtn.style.marginLeft = '1rem';
+    manageBtn.onclick = showAddPlaceModal;
+    
+    navbar.querySelector('.nav-user').appendChild(manageBtn);
+}
+
+// Показать модальное окно добавления места
+function showAddPlaceModal() {
+    const modalHTML = `
+        <div class="image-modal show" id="add-place-modal">
+            <div class="image-modal-content" style="max-width: 600px; max-height: 90vh; overflow-y: auto;">
+                <button class="close-image-btn" onclick="hideAddPlaceModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+                <div style="padding: 2rem;">
+                    <h2 style="font-family: 'Playfair Display', serif; margin-bottom: 1.5rem; text-align: center;">
+                        Добавить новое место
+                    </h2>
+                    
+                    <div style="display: grid; gap: 1.5rem;">
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; color: var(--text-primary); font-weight: 500;">
+                                Название места *
+                            </label>
+                            <input type="text" id="new-place-name" 
+                                   style="width: 100%; padding: 1rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary);"
+                                   placeholder="Например: Кофейня «Название»">
+                        </div>
+                        
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; color: var(--text-primary); font-weight: 500;">
+                                Категория *
+                            </label>
+                            <select id="new-place-category" 
+                                    style="width: 100%; padding: 1rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary);">
+                                <option value="coffee">Кофейня</option>
+                                <option value="restaurant">Ресторан</option>
+                                <option value="bar">Бар/Гастропаб</option>
+                                <option value="cinema">Кинотеатр</option>
+                                <option value="other">Другое</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; color: var(--text-primary); font-weight: 500;">
+                                Описание *
+                            </label>
+                            <textarea id="new-place-description" rows="3"
+                                      style="width: 100%; padding: 1rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary); resize: vertical;"
+                                      placeholder="Краткое описание заведения"></textarea>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div>
+                                <label style="display: block; margin-bottom: 0.5rem; color: var(--text-primary); font-weight: 500;">
+                                    Телефон
+                                </label>
+                                <input type="text" id="new-place-phone"
+                                       style="width: 100%; padding: 1rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary);"
+                                       placeholder="+7 (XXX) XXX-XX-XX">
+                            </div>
+                            <div>
+                                <label style="display: block; margin-bottom: 0.5rem; color: var(--text-primary); font-weight: 500;">
+                                    Ценовой диапазон
+                                </label>
+                                <select id="new-place-price"
+                                        style="width: 100%; padding: 1rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary);">
+                                    <option value="$">$ - Бюджетный</option>
+                                    <option value="$$" selected>$$ - Средний</option>
+                                    <option value="$$$">$$$ - Премиум</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; color: var(--text-primary); font-weight: 500;">
+                                Время работы
+                            </label>
+                            <input type="text" id="new-place-hours"
+                                   style="width: 100%; padding: 1rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary);"
+                                   placeholder="Пн-Пт: 10:00-22:00, Сб-Вс: 11:00-23:00">
+                        </div>
+                        
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; color: var(--text-primary); font-weight: 500;">
+                                Адрес *
+                            </label>
+                            <input type="text" id="new-place-address"
+                                   style="width: 100%; padding: 1rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary);"
+                                   placeholder="Улица, дом">
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div>
+                                <label style="display: block; margin-bottom: 0.5rem; color: var(--text-primary); font-weight: 500;">
+                                    Широта
+                                </label>
+                                <input type="number" step="any" id="new-place-lat"
+                                       style="width: 100%; padding: 1rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary);"
+                                       placeholder="59.880945" value="59.880945">
+                            </div>
+                            <div>
+                                <label style="display: block; margin-bottom: 0.5rem; color: var(--text-primary); font-weight: 500;">
+                                    Долгота
+                                </label>
+                                <input type="number" step="any" id="new-place-lng"
+                                       style="width: 100%; padding: 1rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary);"
+                                       placeholder="29.112260" value="29.112260">
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; color: var(--text-primary); font-weight: 500;">
+                                Особенности (через запятую)
+                            </label>
+                            <input type="text" id="new-place-features"
+                                   style="width: 100%; padding: 1rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary);"
+                                   placeholder="Wi-Fi, Парковка, Терраса">
+                        </div>
+                        
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; color: var(--text-primary); font-weight: 500;">
+                                Ссылка на соц. сеть или сайт
+                            </label>
+                            <input type="text" id="new-place-social"
+                                   style="width: 100%; padding: 1rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary);"
+                                   placeholder="vk.com/username или site.ru">
+                        </div>
+                        
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; color: var(--text-primary); font-weight: 500;">
+                                Ссылки на фото (каждая с новой строки)
+                            </label>
+                            <textarea id="new-place-images" rows="3"
+                                      style="width: 100%; padding: 1rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary); resize: vertical;"
+                                      placeholder="https://example.com/photo1.jpg\nhttps://example.com/photo2.jpg"></textarea>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                        <button onclick="hideAddPlaceModal()" 
+                                style="flex: 1; padding: 1rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--text-primary); border-radius: 8px; cursor: pointer;">
+                            Отмена
+                        </button>
+                        <button onclick="addNewPlace()" 
+                                style="flex: 1; padding: 1rem; background: var(--success); border: none; color: white; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                            <i class="fas fa-plus"></i> Добавить место
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    const modalContainer = document.createElement('div');
+    modalContainer.innerHTML = modalHTML;
+    document.body.appendChild(modalContainer);
+    document.body.style.overflow = 'hidden';
+    
+    // Фокус на первом поле
+    setTimeout(() => {
+        document.getElementById('new-place-name').focus();
+    }, 100);
+}
+
+// Скрыть модальное окно добавления места
+function hideAddPlaceModal() {
+    const modal = document.getElementById('add-place-modal');
+    if (modal) {
+        modal.remove();
+    }
+    document.body.style.overflow = 'auto';
+}
+
+// Добавить новое место
+async function addNewPlace() {
+    const name = document.getElementById('new-place-name').value.trim();
+    const category = document.getElementById('new-place-category').value;
+    const description = document.getElementById('new-place-description').value.trim();
+    const phone = document.getElementById('new-place-phone').value.trim();
+    const price = document.getElementById('new-place-price').value;
+    const hours = document.getElementById('new-place-hours').value.trim();
+    const address = document.getElementById('new-place-address').value.trim();
+    const lat = parseFloat(document.getElementById('new-place-lat').value);
+    const lng = parseFloat(document.getElementById('new-place-lng').value);
+    const features = document.getElementById('new-place-features').value.split(',').map(f => f.trim()).filter(f => f);
+    const social = document.getElementById('new-place-social').value.trim();
+    const images = document.getElementById('new-place-images').value.split('\n').map(url => url.trim()).filter(url => url);
+    
+    // Валидация
+    if (!name || !description || !address) {
+        showNotification('Заполните обязательные поля (название, описание, адрес)', 'error');
+        return;
+    }
+    
+    if (isNaN(lat) || isNaN(lng)) {
+        showNotification('Введите корректные координаты', 'error');
+        return;
+    }
+    
+    try {
+        // Создаем объект места
+        const newPlace = {
+            name: name,
+            category: category,
+            description: description,
+            phone: phone || 'Информация уточняется',
+            price: price,
+            workingHours: hours || 'Информация уточняется',
+            address: address,
+            coords: [lat, lng],
+            features: features,
+            social: social,
+            rating: 0,
+            reviewsCount: 0,
+            isCustom: true // Помечаем как кастомное
+        };
+        
+        // Сохраняем в Firebase
+        const placeId = 'custom_' + Date.now();
+        await savePlaceToFirebase(placeId, newPlace);
+        
+        // Сохраняем изображения если есть
+        if (images.length > 0) {
+            await savePlaceImagesToFirebase(placeId, images);
+        }
+        
+        showNotification(`Место "${name}" успешно добавлено! 🎉`, 'success');
+        hideAddPlaceModal();
+        
+        // Перезагружаем страницу чтобы показать новое место
+        setTimeout(() => {
+            location.reload();
+        }, 2000);
+        
+    } catch (error) {
+        console.error('Ошибка при добавлении места:', error);
+        showNotification('Ошибка при добавлении места', 'error');
+    }
+}
+
+// Сохранить место в Firebase
+function savePlaceToFirebase(placeId, placeData) {
+    return new Promise((resolve, reject) => {
+        const updates = {};
+        updates['customPlaces/' + placeId] = placeData;
+        
+        window.db.ref().update(updates)
+            .then(() => resolve(true))
+            .catch(error => reject(error));
+    });
+}
+
+// Сохранить изображения места в Firebase
+function savePlaceImagesToFirebase(placeId, images) {
+    return new Promise((resolve, reject) => {
+        const updates = {};
+        updates['customPlaceImages/' + placeId] = images;
+        
+        window.db.ref().update(updates)
+            .then(() => resolve(true))
+            .catch(error => reject(error));
+    });
+}
+
+// Загрузка кастомных мест из Firebase
+function loadCustomPlaces() {
+    return new Promise((resolve) => {
+        const customPlacesRef = window.db.ref('customPlaces');
+        customPlacesRef.once('value')
+            .then(snapshot => {
+                const data = snapshot.val();
+                if (data) {
+                    // Добавляем кастомные места в общий список
+                    Object.entries(data).forEach(([id, place]) => {
+                        placesData[place.name] = {
+                            ...place,
+                            isCustom: true
+                        };
+                    });
+                    console.log('✅ Загружены кастомные места:', data);
+                }
+                resolve();
+            })
+            .catch(error => {
+                console.error('❌ Ошибка загрузки кастомных мест:', error);
+                resolve();
+            });
+    });
+}
+
+// Загрузка кастомных изображений из Firebase
+function loadCustomPlaceImages() {
+    return new Promise((resolve) => {
+        const customImagesRef = window.db.ref('customPlaceImages');
+        customImagesRef.once('value')
+            .then(snapshot => {
+                const data = snapshot.val();
+                if (data) {
+                    Object.entries(data).forEach(([id, images]) => {
+                        // Находим название места по ID (нужно сопоставить)
+                        const placeEntry = Object.entries(placesData).find(([name, place]) => 
+                            place.isCustom && id.includes('custom_')
+                        );
+                        if (placeEntry) {
+                            placeImages[placeEntry[0]] = images;
+                        }
+                    });
+                    console.log('✅ Загружены кастомные изображения:', data);
+                }
+                resolve();
+            })
+            .catch(error => {
+                console.error('❌ Ошибка загрузки кастомных изображений:', error);
+                resolve();
+            });
+    });
+}
+
 // ================== ОСНОВНЫЕ ФУНКЦИИ ==================
 
 // Проверяем, авторизован ли пользователь при загрузке
@@ -446,6 +1006,21 @@ function showMainContent(user) {
         updateVoteButtons();
         setupVotesSearch();
     }, 1000);
+    
+    // Загружаем кастомные места и изображения
+    setTimeout(async () => {
+        await loadCustomPlaces();
+        await loadCustomPlaceImages();
+        
+        // Перерисовываем карточки если нужно
+        if (Object.keys(placesData).length > 7) { // Если есть кастомные места
+            // Можно добавить логику для перерисовки карточек
+            console.log('🔄 Обновляем интерфейс с учетом кастомных мест');
+        }
+        
+        // Инициализируем управление карточками для владельца
+        initCardManagement();
+    }, 1500);
 }
 
 // Функция входа
@@ -763,199 +1338,6 @@ function renderVotingResults() {
     console.log('🎯 Рендеринг результатов голосования...');
     renderChart();
     renderVotesList();
-}
-
-// Рендеринг диаграммы - УЛУЧШЕННАЯ ВЕРТИКАЛЬНАЯ ДИАГРАММА
-function renderChart() {
-    const canvas = document.getElementById('votes-chart');
-    if (!canvas) {
-        console.log('❌ Canvas не найден');
-        return;
-    }
-    
-    const ctx = canvas.getContext('2d');
-    const container = canvas.parentElement;
-    
-    // Устанавливаем размеры canvas
-    canvas.width = container.clientWidth;
-    canvas.height = 400; // Фиксированная высота для вертикальной диаграммы
-    
-    // Очищаем canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    console.log('🎨 Рендерим диаграмму с votingData:', votingData);
-    
-    // Считаем голоса с защитой от ошибок
-    const voteCounts = {};
-    
-    if (votingData && typeof votingData === 'object') {
-        Object.values(votingData).forEach(user => {
-            if (user && Array.isArray(user.votedFor)) {
-                user.votedFor.forEach(place => {
-                    if (place) {
-                        voteCounts[place] = (voteCounts[place] || 0) + 1;
-                    }
-                });
-            }
-        });
-    }
-    
-    console.log('📊 Результаты подсчета:', voteCounts);
-    
-    // Сортируем по количеству голосов (по убыванию)
-    const sortedPlaces = Object.entries(voteCounts)
-        .sort(([,a], [,b]) => b - a);
-    
-    // Обновляем общее количество голосов
-    const totalVotes = Object.values(voteCounts).reduce((sum, count) => sum + count, 0);
-    const totalVotesElement = document.getElementById('total-votes-count');
-    if (totalVotesElement) {
-        totalVotesElement.textContent = totalVotes;
-    }
-    
-    if (sortedPlaces.length === 0) {
-        // Показываем сообщение когда нет голосов
-        ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-secondary');
-        ctx.font = '16px Inter';
-        ctx.textAlign = 'center';
-        ctx.fillText('Пока нет голосов. Будьте первым!', canvas.width / 2, canvas.height / 2);
-        return;
-    }
-    
-    const maxVotes = Math.max(...Object.values(voteCounts));
-    
-    // Настройки для вертикальной диаграммы
-    const padding = { top: 40, right: 40, bottom: 80, left: 80 };
-    const chartWidth = canvas.width - padding.left - padding.right;
-    const chartHeight = canvas.height - padding.top - padding.bottom;
-    const barWidth = Math.min(60, chartWidth / sortedPlaces.length - 10);
-    const barSpacing = (chartWidth - (barWidth * sortedPlaces.length)) / (sortedPlaces.length + 1);
-    
-    // Фон для всей диаграммы
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.02)';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-    // Рисуем вертикальные бары
-    sortedPlaces.forEach(([place, votes], index) => {
-        const x = padding.left + barSpacing + index * (barWidth + barSpacing);
-        const barHeight = (votes / maxVotes) * chartHeight;
-        const y = padding.top + chartHeight - barHeight;
-        
-        // Градиент для бара
-        const gradient = ctx.createLinearGradient(x, y, x, y + barHeight);
-        gradient.addColorStop(0, '#ff6b35');
-        gradient.addColorStop(1, '#ff8c5a');
-        
-        // Бар
-        ctx.fillStyle = gradient;
-        roundRect(ctx, x, y, barWidth, barHeight, 8);
-        
-        // Тень
-        ctx.shadowColor = 'rgba(255, 107, 53, 0.3)';
-        ctx.shadowBlur = 10;
-        ctx.shadowOffsetY = 5;
-        roundRect(ctx, x, y, barWidth, barHeight, 8);
-        ctx.shadowColor = 'transparent';
-        
-        // Количество голосов над баром
-        ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-primary');
-        ctx.font = 'bold 14px Inter';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'bottom';
-        ctx.fillText(votes, x + barWidth / 2, y - 5);
-        
-        // Название места под баром (с переносом строк)
-        ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-secondary');
-        ctx.font = '12px Inter';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'top';
-        
-        let displayName = place;
-        // Разбиваем длинные названия на две строки
-        if (displayName.length > 15) {
-            const words = displayName.split(' ');
-            let line1 = '';
-            let line2 = '';
-            
-            for (const word of words) {
-                if ((line1 + word).length <= 15) {
-                    line1 += (line1 ? ' ' : '') + word;
-                } else {
-                    line2 += (line2 ? ' ' : '') + word;
-                }
-            }
-            
-            if (line2.length > 15) {
-                line2 = line2.substring(0, 14) + '…';
-            }
-            
-            ctx.fillText(line1, x + barWidth / 2, padding.top + chartHeight + 10);
-            if (line2) {
-                ctx.fillText(line2, x + barWidth / 2, padding.top + chartHeight + 25);
-            }
-        } else {
-            ctx.fillText(displayName, x + barWidth / 2, padding.top + chartHeight + 10);
-        }
-        
-        // Процент голосов внутри бара (если достаточно места)
-        if (barHeight > 30) {
-            const percentage = totalVotes > 0 ? ((votes / totalVotes) * 100).toFixed(1) : 0;
-            ctx.fillStyle = 'white';
-            ctx.font = 'bold 11px Inter';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(`${percentage}%`, x + barWidth / 2, y + barHeight / 2);
-        }
-    });
-    
-    // Ось Y (количество голосов)
-    ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--border');
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(padding.left, padding.top);
-    ctx.lineTo(padding.left, padding.top + chartHeight);
-    ctx.stroke();
-    
-    // Засечки на оси Y
-    for (let i = 0; i <= 5; i++) {
-        const y = padding.top + chartHeight - (i / 5) * chartHeight;
-        const value = Math.round((i / 5) * maxVotes);
-        
-        ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--border');
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(padding.left - 5, y);
-        ctx.lineTo(padding.left, y);
-        ctx.stroke();
-        
-        ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-secondary');
-        ctx.font = '12px Inter';
-        ctx.textAlign = 'right';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(value, padding.left - 10, y);
-    }
-    
-    // Заголовок
-    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-primary');
-    ctx.font = 'bold 16px Inter';
-    ctx.textAlign = 'center';
-    ctx.fillText('Результаты голосования', canvas.width / 2, 20);
-}
-
-// Вспомогательная функция для скругленных прямоугольников
-function roundRect(ctx, x, y, width, height, radius) {
-    ctx.beginPath();
-    ctx.moveTo(x + radius, y);
-    ctx.lineTo(x + width - radius, y);
-    ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
-    ctx.lineTo(x + width, y + height - radius);
-    ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
-    ctx.lineTo(x + radius, y + height);
-    ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
-    ctx.lineTo(x, y + radius);
-    ctx.quadraticCurveTo(x, y, x + radius, y);
-    ctx.closePath();
-    ctx.fill();
 }
 
 // Рендеринг списка голосов
