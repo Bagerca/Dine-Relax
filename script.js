@@ -45,18 +45,6 @@ const placesData = {
         features: ['Wi-Fi', 'Парковка', 'Терраса', 'Доступно с животными', 'Бесплатная вода'],
         social: 'vk.com/verandacoffee'
     },
-    'Кафе-пекарня «Мой Сосновый Бор»': {
-        coords: [59.880816, 29.112933],
-        address: 'Сосновый Бор, Солнечная улица, 9',
-        description: 'Уютная кофейня-пекарня с большой выбором десертов, сытных блюд и детской комнатой',
-        phone: '+7 (921) 882-40-02',
-        workingHours: 'Пн-Пт: 09:00–22:00, Сб-Вс: 10:00–22:00',
-        rating: 4.5,
-        reviewsCount: 390,
-        price: '$$',
-        features: ['Wi-Fi', 'Парковка', 'Летняя веранда', 'Детская комната', 'Доставка'],
-        social: 'vk.com/coffeesbor'
-    },
     'Ресторан «ПхалиХинкали»': {
         coords: [59.880479, 29.117188],
         address: 'Сосновый Бор, Ленинградская улица, 46',
@@ -116,6 +104,58 @@ const placesData = {
         price: '$$',
         features: ['Суши-бар «Кин-но»', 'Удобные кресла', 'Хороший звук', 'Несколько залов', 'Японская кухни'],
         social: 'sovremennik.sbor.net'
+    },
+    'Ресторан «Дюны»': {
+        coords: [59.878952, 29.112933],
+        address: 'Улица Соколова, 15, Сосновый Бор',
+        description: 'Уютный семейный ресторан с приглушенным светом и стильным интерьером, который призван возродить атмосферу истории города Сосновый Бор.',
+        phone: '+7 (921) 888-88-35',
+        workingHours: 'Пн-Чт, Вс: 12:30–00:00<br>Пт-Сб: 12:30–02:00',
+        rating: 4.3,
+        reviewsCount: 127,
+        price: '$$',
+        features: ['Wi-Fi', 'Детская комната', 'Детское меню', 'Проведение свадеб', 'Парковка'],
+        social: 'vk.com/dune_rest',
+        category: 'restaurant'
+    },
+    'Кафе «Радуга»': {
+        coords: [59.875323, 29.071060],
+        address: 'Улица Красных Фортов, 11, Сосновый Бор',
+        description: 'Уютное и недорогое кафе, где подают блюда домашней кухни, в том числе комплексные обеды.',
+        phone: '+7 (81369) 4-26-15',
+        workingHours: 'Ежедневно: 08:30–19:30<br>Перерыв: 15:00–16:00',
+        rating: 4.4,
+        reviewsCount: 427,
+        price: '$',
+        features: ['Бизнес-ланч', 'Поминальные обеды', 'Проведение банкетов', 'Заказ навынос'],
+        social: 'vk.com/raduganiti',
+        category: 'cafe'
+    },
+    'Ресторан «Мой Сосновый Бор»': {
+        coords: [59.880945, 29.112260],
+        address: 'Солнечная улица, 9, Сосновый Бор',
+        description: 'Ресторан европейской кухни с уютным интерьером, подходящий как для завтраков и бизнес-ланчей, так и для проведения банкетов.',
+        phone: '+7 (921) 882-40-02',
+        workingHours: 'Пн-Чт, Вс: 12:00–23:00<br>Пт-Сб: 12:00–00:00',
+        rating: 4.5,
+        reviewsCount: 289,
+        price: '$$',
+        features: ['Wi-Fi', 'Бизнес-ланч', 'Завтрак', 'Винная карта', 'Проведение банкетов', 'Заказ навынос', 'Можно с ноутбуком'],
+        social: 'vk.com/msb_rest',
+        category: 'restaurant'
+    },
+    'Стритфуд «Мой Сосновый Бор»': {
+        coords: [59.904453, 29.071661],
+        address: 'Приморский парк, Сосновый Бор',
+        description: 'Небольшое кафе с блюдами уличной еды, расположенное в Приморском парке, вблизи Финского залива.',
+        phone: '+7 (931) 370-70-00',
+        workingHours: 'Ежедневно: 11:00–22:00',
+        rating: 4.8,
+        reviewsCount: 2104,
+        price: '$',
+        features: ['Еда навынос', 'Расположение в парке', 'Рядом с заливом'],
+        social: 'vk.com/msb_park',
+        category: 'cafe'
     }
 };
 
@@ -125,10 +165,6 @@ const placeImages = {
         'https://avatars.mds.yandex.net/get-altay/13054604/2a00000190a77560adb2066c2b0ff460732b/XXXL',
         'https://avatars.mds.yandex.net/get-altay/14014620/2a000001912c9dca1b4e62d778d484446b94/XXXL',
         'https://avatars.mds.yandex.net/get-altay/5456504/2a0000017c7ea8dd69a6f7b112b5640b870d/XXXL'
-    ],
-    'Кафе-пекарня «Мой Сосновый Бор»': [
-        'https://example.com/moy-sbor-interior.jpg',
-        'https://example.com/moy-sbor-bakery.jpg'
     ],
     'Ресторан «ПхалиХинкали»': [
         'https://example.com/phali-dishes.jpg',
@@ -152,6 +188,20 @@ const placeImages = {
         'https://example.com/sovremennik-building.jpg',
         'https://example.com/sovremennik-hall.jpg',
         'https://example.com/sovremennik-bar.jpg'
+    ],
+    'Ресторан «Дюны»': [
+        'https://avatars.mds.yandex.net/get-altay/10664848/2a0000017dfb9b5c49e3e56e12b3c3a8a6e1/XXXL'
+    ],
+    'Кафе «Радуга»': [
+        'https://avatars.mds.yandex.net/get-altay/988708/2a00000161c09c5c9a4a5d9d4e5d8b8a8a2e/XXXL'
+    ],
+    'Ресторан «Мой Сосновый Бор»': [
+        'https://example.com/msb-restaurant-interior.jpg',
+        'https://example.com/msb-restaurant-food.jpg'
+    ],
+    'Стритфуд «Мой Сосновый Бор»': [
+        'https://example.com/msb-streetfood-park.jpg',
+        'https://example.com/msb-streetfood-dishes.jpg'
     ]
 };
 
@@ -399,7 +449,7 @@ function renderChart() {
     const maxVotes = Math.max(...Object.values(voteCounts));
     
     // Настройки для горизонтальной диаграммы
-    const padding = { top: 60, right: 100, bottom: 60, left: 20 };
+    const padding = { top: 60, right: 150, bottom: 60, left: 20 }; // Увеличили правый отступ
     const chartWidth = canvas.width - padding.left - padding.right;
     const chartHeight = canvas.height - padding.top - padding.bottom;
     const barHeight = 35;
@@ -439,45 +489,56 @@ function renderChart() {
         
         // Обрезаем название если слишком длинное
         let displayName = shortName;
-        const maxNameWidth = barWidth - 100; // Оставляем место для процентов
+        const maxNameWidth = barWidth - 120; // Оставляем место для процентов и голосов
         let textWidth = ctx.measureText(displayName).width;
         
         if (textWidth > maxNameWidth && barWidth > 150) {
-            // Постепенно укорачиваем название
-            while (textWidth > maxNameWidth && displayName.length > 10) {
+            while (textWidth > maxNameWidth && displayName.length > 8) {
                 displayName = displayName.substring(0, displayName.length - 1);
                 textWidth = ctx.measureText(displayName + '...').width;
             }
             displayName = displayName + '...';
         }
         
-        ctx.fillText(displayName, padding.left + 10, y + barHeight / 2);
+        // Рисуем название только если бар достаточно широк
+        if (barWidth > 100) {
+            ctx.fillText(displayName, padding.left + 10, y + barHeight / 2);
+        }
         
-        // Процент голосов ВНУТРИ бара (справа)
+        // Процент голосов ВНУТРИ бара (справа) - только если есть место
         const percentage = totalVotes > 0 ? ((votes / totalVotes) * 100).toFixed(1) : 0;
         ctx.fillStyle = 'white';
         ctx.font = 'bold 14px Inter';
         ctx.textAlign = 'right';
         
         // Позиционируем проценты внутри бара, если достаточно места
-        if (barWidth > 120) {
+        if (barWidth > 150) {
             ctx.fillText(`${percentage}%`, padding.left + barWidth - 10, y + barHeight / 2);
-        } else {
-            // Иначе рисуем справа от бара
-            ctx.fillText(`${percentage}%`, padding.left + barWidth + 40, y + barHeight / 2);
         }
         
-        // Количество голосов (под баром или справа)
+        // Количество голосов ВСЕГДА СПРАВА ОТ БАРА
         ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-secondary');
         ctx.font = '12px Inter';
         ctx.textAlign = 'left';
+        ctx.textBaseline = 'middle';
         
-        if (barWidth > 150) {
-            // Внутри бара под названием
-            ctx.fillText(`${votes} голосов`, padding.left + 10, y + barHeight + 15);
-        } else {
-            // Справа от бара
-            ctx.fillText(`${votes} голосов`, padding.left + barWidth + 10, y + barHeight / 2);
+        // Позиция справа от бара + отступ
+        const votesText = `${votes} голосов`;
+        const votesX = padding.left + chartWidth + 10;
+        
+        ctx.fillText(votesText, votesX, y + barHeight / 2);
+        
+        // Если проценты не поместились внутри бара, показываем их справа
+        if (barWidth <= 150) {
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 12px Inter';
+            ctx.textAlign = 'left';
+            ctx.fillText(`${percentage}%`, votesX, y + barHeight / 2 - 8);
+            
+            // Сдвигаем голоса ниже
+            ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-secondary');
+            ctx.font = '12px Inter';
+            ctx.fillText(votesText, votesX, y + barHeight / 2 + 8);
         }
     });
     
@@ -568,6 +629,8 @@ function initCardManagement() {
     const currentUser = users[currentUserKey];
     if (currentUser && currentUser.role === 'Владелец сайта') {
         addManagementInterface();
+        // Добавляем кнопки управления после загрузки DOM
+        setTimeout(addManagementButtons, 1000);
     }
 }
 
@@ -582,6 +645,383 @@ function addManagementInterface() {
     manageBtn.onclick = showAddPlaceModal;
     
     navbar.querySelector('.nav-user').appendChild(manageBtn);
+}
+
+// Функции управления карточками для владельца
+function addManagementButtons() {
+    const currentUser = users[currentUserKey];
+    if (currentUser && currentUser.role === 'Владелец сайта') {
+        // Добавляем кнопки управления на кастомные карточки
+        document.querySelectorAll('.place-card').forEach(card => {
+            const placeName = card.querySelector('.card-title').textContent;
+            const placeData = placesData[placeName];
+            
+            if (placeData && placeData.isCustom) {
+                // Добавляем кнопки управления
+                const managementDiv = document.createElement('div');
+                managementDiv.className = 'card-management';
+                managementDiv.style.cssText = `
+                    position: absolute;
+                    top: 10px;
+                    left: 10px;
+                    display: flex;
+                    gap: 5px;
+                    z-index: 20;
+                `;
+                
+                const editBtn = document.createElement('button');
+                editBtn.innerHTML = '<i class="fas fa-edit"></i>';
+                editBtn.title = 'Редактировать';
+                editBtn.style.cssText = `
+                    background: var(--warning);
+                    color: black;
+                    border: none;
+                    border-radius: 5px;
+                    width: 30px;
+                    height: 30px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    cursor: pointer;
+                    font-size: 12px;
+                `;
+                editBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    editPlace(placeName);
+                };
+                
+                const deleteBtn = document.createElement('button');
+                deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
+                deleteBtn.title = 'Удалить';
+                deleteBtn.style.cssText = `
+                    background: var(--error);
+                    color: white;
+                    border: none;
+                    border-radius: 5px;
+                    width: 30px;
+                    height: 30px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    cursor: pointer;
+                    font-size: 12px;
+                `;
+                deleteBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    deletePlace(placeName);
+                };
+                
+                managementDiv.appendChild(editBtn);
+                managementDiv.appendChild(deleteBtn);
+                
+                const cardHeader = card.querySelector('.card-header');
+                cardHeader.style.position = 'relative';
+                cardHeader.appendChild(managementDiv);
+            }
+        });
+    }
+}
+
+// Редактирование места
+function editPlace(placeName) {
+    const placeData = placesData[placeName];
+    if (!placeData) return;
+    
+    const modalHTML = `
+        <div class="image-modal show" id="edit-place-modal">
+            <div class="image-modal-content" style="max-width: 600px; max-height: 90vh; overflow-y: auto;">
+                <button class="close-image-btn" onclick="hideEditPlaceModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+                <div style="padding: 2rem;">
+                    <h2 style="font-family: 'Playfair Display', serif; margin-bottom: 1.5rem; text-align: center;">
+                        Редактировать место
+                    </h2>
+                    
+                    <div style="display: grid; gap: 1.5rem;">
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; color: var(--text-primary); font-weight: 500;">
+                                Название места *
+                            </label>
+                            <input type="text" id="edit-place-name" 
+                                   style="width: 100%; padding: 1rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary);"
+                                   value="${placeName}">
+                        </div>
+                        
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; color: var(--text-primary); font-weight: 500;">
+                                Категория *
+                            </label>
+                            <select id="edit-place-category" 
+                                    style="width: 100%; padding: 1rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary);">
+                                <option value="coffee" ${placeData.category === 'coffee' ? 'selected' : ''}>Кофейня</option>
+                                <option value="restaurant" ${placeData.category === 'restaurant' ? 'selected' : ''}>Ресторан</option>
+                                <option value="cafe" ${placeData.category === 'cafe' ? 'selected' : ''}>Кафе</option>
+                                <option value="bar" ${placeData.category === 'bar' ? 'selected' : ''}>Бар</option>
+                                <option value="cinema" ${placeData.category === 'cinema' ? 'selected' : ''}>Кинотеатр</option>
+                                <option value="other" ${!placeData.category ? 'selected' : ''}>Другое</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; color: var(--text-primary); font-weight: 500;">
+                                Описание *
+                            </label>
+                            <textarea id="edit-place-description" rows="3"
+                                      style="width: 100%; padding: 1rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary); resize: vertical;"
+                                      placeholder="Краткое описание заведения">${placeData.description}</textarea>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div>
+                                <label style="display: block; margin-bottom: 0.5rem; color: var(--text-primary); font-weight: 500;">
+                                    Телефон
+                                </label>
+                                <input type="text" id="edit-place-phone"
+                                       style="width: 100%; padding: 1rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary);"
+                                       value="${placeData.phone || ''}">
+                            </div>
+                            <div>
+                                <label style="display: block; margin-bottom: 0.5rem; color: var(--text-primary); font-weight: 500;">
+                                    Ценовой диапазон
+                                </label>
+                                <select id="edit-place-price"
+                                        style="width: 100%; padding: 1rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary);">
+                                    <option value="$" ${placeData.price === '$' ? 'selected' : ''}>$ - Бюджетный</option>
+                                    <option value="$$" ${placeData.price === '$$' ? 'selected' : ''}>$$ - Средний</option>
+                                    <option value="$$$" ${placeData.price === '$$$' ? 'selected' : ''}>$$$ - Премиум</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; color: var(--text-primary); font-weight: 500;">
+                                Время работы
+                            </label>
+                            <input type="text" id="edit-place-hours"
+                                   style="width: 100%; padding: 1rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary);"
+                                   value="${placeData.workingHours || ''}">
+                        </div>
+                        
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; color: var(--text-primary); font-weight: 500;">
+                                Адрес *
+                            </label>
+                            <input type="text" id="edit-place-address"
+                                   style="width: 100%; padding: 1rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary);"
+                                   value="${placeData.address}">
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div>
+                                <label style="display: block; margin-bottom: 0.5rem; color: var(--text-primary); font-weight: 500;">
+                                    Широта
+                                </label>
+                                <input type="number" step="any" id="edit-place-lat"
+                                       style="width: 100%; padding: 1rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary);"
+                                       value="${placeData.coords[0]}">
+                            </div>
+                            <div>
+                                <label style="display: block; margin-bottom: 0.5rem; color: var(--text-primary); font-weight: 500;">
+                                    Долгота
+                                </label>
+                                <input type="number" step="any" id="edit-place-lng"
+                                       style="width: 100%; padding: 1rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary);"
+                                       value="${placeData.coords[1]}">
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; color: var(--text-primary); font-weight: 500;">
+                                Особенности (через запятую)
+                            </label>
+                            <input type="text" id="edit-place-features"
+                                   style="width: 100%; padding: 1rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary);"
+                                   value="${placeData.features ? placeData.features.join(', ') : ''}">
+                        </div>
+                        
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; color: var(--text-primary); font-weight: 500;">
+                                Ссылка на соц. сеть или сайт
+                            </label>
+                            <input type="text" id="edit-place-social"
+                                   style="width: 100%; padding: 1rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary);"
+                                   value="${placeData.social || ''}">
+                        </div>
+                        
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; color: var(--text-primary); font-weight: 500;">
+                                Рейтинг
+                            </label>
+                            <input type="number" step="0.1" min="0" max="5" id="edit-place-rating"
+                                   style="width: 100%; padding: 1rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary);"
+                                   value="${placeData.rating || 0}">
+                        </div>
+                        
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; color: var(--text-primary); font-weight: 500;">
+                                Количество отзывов
+                            </label>
+                            <input type="number" id="edit-place-reviews"
+                                   style="width: 100%; padding: 1rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary);"
+                                   value="${placeData.reviewsCount || 0}">
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                        <button onclick="hideEditPlaceModal()" 
+                                style="flex: 1; padding: 1rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--text-primary); border-radius: 8px; cursor: pointer;">
+                            Отмена
+                        </button>
+                        <button onclick="updatePlace('${placeName}')" 
+                                style="flex: 1; padding: 1rem; background: var(--warning); border: none; color: white; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                            <i class="fas fa-save"></i> Сохранить изменения
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    const modalContainer = document.createElement('div');
+    modalContainer.innerHTML = modalHTML;
+    document.body.appendChild(modalContainer);
+    document.body.style.overflow = 'hidden';
+}
+
+function hideEditPlaceModal() {
+    const modal = document.getElementById('edit-place-modal');
+    if (modal) {
+        modal.remove();
+    }
+    document.body.style.overflow = 'auto';
+}
+
+async function updatePlace(oldPlaceName) {
+    const name = document.getElementById('edit-place-name').value.trim();
+    const category = document.getElementById('edit-place-category').value;
+    const description = document.getElementById('edit-place-description').value.trim();
+    const phone = document.getElementById('edit-place-phone').value.trim();
+    const price = document.getElementById('edit-place-price').value;
+    const hours = document.getElementById('edit-place-hours').value.trim();
+    const address = document.getElementById('edit-place-address').value.trim();
+    const lat = parseFloat(document.getElementById('edit-place-lat').value);
+    const lng = parseFloat(document.getElementById('edit-place-lng').value);
+    const features = document.getElementById('edit-place-features').value.split(',').map(f => f.trim()).filter(f => f);
+    const social = document.getElementById('edit-place-social').value.trim();
+    const rating = parseFloat(document.getElementById('edit-place-rating').value);
+    const reviewsCount = parseInt(document.getElementById('edit-place-reviews').value);
+    
+    // Валидация
+    if (!name || !description || !address) {
+        showNotification('Заполните обязательные поля (название, описание, адрес)', 'error');
+        return;
+    }
+    
+    if (isNaN(lat) || isNaN(lng)) {
+        showNotification('Введите корректные координаты', 'error');
+        return;
+    }
+    
+    try {
+        // Находим ID места в Firebase
+        const customPlacesRef = window.db.ref('customPlaces');
+        const snapshot = await customPlacesRef.once('value');
+        const customPlaces = snapshot.val();
+        
+        let placeId = null;
+        Object.entries(customPlaces || {}).forEach(([id, place]) => {
+            if (place.name === oldPlaceName) {
+                placeId = id;
+            }
+        });
+        
+        if (!placeId) {
+            showNotification('Не удалось найти место для редактирования', 'error');
+            return;
+        }
+        
+        // Обновляем объект места
+        const updatedPlace = {
+            name: name,
+            category: category,
+            description: description,
+            phone: phone || 'Информация уточняется',
+            price: price,
+            workingHours: hours || 'Информация уточняется',
+            address: address,
+            coords: [lat, lng],
+            features: features,
+            social: social,
+            rating: rating,
+            reviewsCount: reviewsCount,
+            isCustom: true
+        };
+        
+        // Сохраняем в Firebase
+        await savePlaceToFirebase(placeId, updatedPlace);
+        
+        // Обновляем локальные данные
+        delete placesData[oldPlaceName];
+        placesData[name] = updatedPlace;
+        
+        showNotification(`Место "${name}" успешно обновлено! ✨`, 'success');
+        hideEditPlaceModal();
+        
+        // Перезагружаем страницу
+        setTimeout(() => {
+            location.reload();
+        }, 1500);
+        
+    } catch (error) {
+        console.error('Ошибка при обновлении места:', error);
+        showNotification('Ошибка при обновлении места', 'error');
+    }
+}
+
+// Удаление места
+async function deletePlace(placeName) {
+    if (!confirm(`Вы уверены, что хотите удалить "${placeName}"? Это действие нельзя отменить.`)) {
+        return;
+    }
+    
+    try {
+        // Находим ID места в Firebase
+        const customPlacesRef = window.db.ref('customPlaces');
+        const snapshot = await customPlacesRef.once('value');
+        const customPlaces = snapshot.val();
+        
+        let placeId = null;
+        Object.entries(customPlaces || {}).forEach(([id, place]) => {
+            if (place.name === placeName) {
+                placeId = id;
+            }
+        });
+        
+        if (!placeId) {
+            showNotification('Не удалось найти место для удаления', 'error');
+            return;
+        }
+        
+        // Удаляем из Firebase
+        await window.db.ref('customPlaces/' + placeId).remove();
+        await window.db.ref('customPlaceImages/' + placeId).remove();
+        
+        // Удаляем из локальных данных
+        delete placesData[placeName];
+        delete placeImages[placeName];
+        
+        showNotification(`Место "${placeName}" успешно удалено! 🗑️`, 'success');
+        
+        // Перезагружаем страницу
+        setTimeout(() => {
+            location.reload();
+        }, 1500);
+        
+    } catch (error) {
+        console.error('Ошибка при удалении места:', error);
+        showNotification('Ошибка при удалении места', 'error');
+    }
 }
 
 // Показать модальное окно добавления места
@@ -615,6 +1055,7 @@ function showAddPlaceModal() {
                                     style="width: 100%; padding: 1rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary);">
                                 <option value="coffee">Кофейня</option>
                                 <option value="restaurant">Ресторан</option>
+                                <option value="cafe">Кафе</option>
                                 <option value="bar">Бар/Гастропаб</option>
                                 <option value="cinema">Кинотеатр</option>
                                 <option value="other">Другое</option>
