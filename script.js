@@ -207,8 +207,25 @@ function loadVotingDataFromFirebase() {
         votesRef.on('value', (snapshot) => {
             const data = snapshot.val();
             console.log('📊 Данные получены из Firebase:', data);
-            votingData = data || {};
-            console.log('📈 votingData после обновления:', votingData);
+            
+            // ВАЖНО: Нормализуем структуру данных
+            votingData = {};
+            if (data && typeof data === 'object') {
+                Object.keys(data).forEach(key => {
+                    const userData = data[key];
+                    if (userData && typeof userData === 'object') {
+                        // Гарантируем, что votedFor всегда массив
+                        votingData[key] = {
+                            name: userData.name || 'Неизвестный',
+                            role: userData.role || 'Ученик',
+                            avatar: userData.avatar || '?',
+                            votedFor: Array.isArray(userData.votedFor) ? userData.votedFor : []
+                        };
+                    }
+                });
+            }
+            
+            console.log('📈 votingData после нормализации:', votingData);
             renderVotingResults();
             updateVoteButtons();
         }, (error) => {
@@ -248,26 +265,26 @@ function saveVoteToFirebase(userKey, voteData) {
 
 // Обновленная функция голосования
 async function handleVote(placeName) {
-    console.log('🗳️ Начало голосования за:', placeName);
-    console.log('🔑 Текущий currentUserKey:', currentUserKey);
-    console.log('📊 Текущий пользователь:', users[currentUserKey]);
+    console.log('🗳️ Начало голосования за:', placeName, 'пользователь:', currentUserKey);
     
     if (!currentUserKey) {
-        console.error('❌ currentUserKey не установлен!');
         showNotification('Для голосования необходимо войти в систему', 'error');
         return;
     }
     
     const currentUser = users[currentUserKey];
     if (!currentUser) {
-        console.error('❌ Пользователь не найден для ключа:', currentUserKey);
         showNotification('Ошибка: пользователь не найден', 'error');
         return;
     }
     
     try {
-        // Создаем копию текущих данных
-        const userVotes = votingData[currentUserKey] ? [...votingData[currentUserKey].votedFor] : [];
+        // ГАРАНТИРУЕМ, что votedFor всегда массив
+        const currentUserData = votingData[currentUserKey];
+        const userVotes = currentUserData && Array.isArray(currentUserData.votedFor) 
+            ? [...currentUserData.votedFor] 
+            : [];
+        
         const hasVoted = userVotes.includes(placeName);
         
         let newVotes;
@@ -281,7 +298,7 @@ async function handleVote(placeName) {
             showNotification(`Вы проголосовали за "${placeName}"! 👍`, 'success');
         }
         
-        // Создаем объект для сохранения
+        // Создаем объект для сохранения с гарантированной структурой
         const voteData = {
             name: currentUser.name,
             role: currentUser.role,
@@ -314,17 +331,10 @@ async function handleVote(placeName) {
 function initVotingSystem() {
     console.log('🚀 Инициализация системы голосования...');
     console.log('🔑 currentUserKey при инициализации:', currentUserKey);
-    
     votingData = {}; // Сбрасываем данные
     loadVotingDataFromFirebase(); // Загружаем заново
     setupVotingButtons();
     setupVotesSearch();
-    
-    // Принудительно обновляем кнопки через секунду
-    setTimeout(() => {
-        console.log('🔄 Принудительное обновление кнопок голосования');
-        updateVoteButtons();
-    }, 1000);
 }
 
 // ================== ОСНОВНЫЕ ФУНКЦИИ ==================
@@ -333,19 +343,12 @@ function initVotingSystem() {
 window.addEventListener('load', () => {
     console.log('🔄 Загрузка страницы...');
     const savedUser = localStorage.getItem('currentUser');
-    console.log('💾 Сохраненный пользователь:', savedUser);
-    
     if (savedUser) {
-        try {
-            const user = JSON.parse(savedUser);
-            console.log('👤 Восстановленный пользователь:', user);
-            showMainContent(user);
-        } catch (e) {
-            console.error('❌ Ошибка парсинга сохраненного пользователя:', e);
-            localStorage.removeItem('currentUser');
-            accessKeyInput.focus();
-        }
+        const user = JSON.parse(savedUser);
+        console.log('💾 Сохраненный пользователь:', user);
+        showMainContent(user);
     } else {
+        console.log('👋 Пользователь не авторизован');
         accessKeyInput.focus();
     }
 });
@@ -398,22 +401,19 @@ function showMainContent(user) {
     const displayName = formatDisplayName(user);
     welcomeName.textContent = displayName;
     
-    // Улучшенная логика определения currentUserKey
-    if (user.key && users[user.key]) {
+    // Сохраняем ключ пользователя
+    if (users[user.key]) {
         currentUserKey = user.key;
         console.log('✅ currentUserKey установлен из user.key:', currentUserKey);
     } else {
-        // Ищем пользователя по имени и роли
-        const userEntry = Object.entries(users).find(([key, u]) => 
-            u.name === user.name && u.role === user.role
-        );
+        // Находим ключ по имени (fallback)
+        const userEntry = Object.entries(users).find(([key, u]) => u.name === user.name && u.role === user.role);
         if (userEntry) {
             currentUserKey = userEntry[0];
-            console.log('✅ currentUserKey найден по имени:', currentUserKey);
+            user.key = currentUserKey; // сохраняем ключ в объекте пользователя
+            console.log('🔍 currentUserKey найден по имени:', currentUserKey);
         } else {
-            console.error('❌ Не удалось найти currentUserKey для пользователя:', user);
-            showNotification('Ошибка определения пользователя', 'error');
-            return;
+            console.warn('⚠️ Не удалось найти ключ пользователя');
         }
     }
     
@@ -728,7 +728,14 @@ function setupVotingButtons() {
 // Обновление кнопок голосования
 function updateVoteButtons() {
     const voteButtons = document.querySelectorAll('.vote-btn');
-    const currentUserVotes = votingData[currentUserKey] ? votingData[currentUserKey].votedFor : [];
+    
+    // ГАРАНТИРУЕМ безопасный доступ к данным
+    const currentUserData = votingData[currentUserKey];
+    const currentUserVotes = currentUserData && Array.isArray(currentUserData.votedFor) 
+        ? currentUserData.votedFor 
+        : [];
+    
+    console.log('🔄 Обновление кнопок для пользователя:', currentUserKey, 'голоса:', currentUserVotes);
     
     voteButtons.forEach(btn => {
         const card = btn.closest('.place-card');
@@ -777,7 +784,7 @@ function renderChart() {
     
     if (votingData && typeof votingData === 'object') {
         Object.values(votingData).forEach(user => {
-            if (user && user.votedFor && Array.isArray(user.votedFor)) {
+            if (user && Array.isArray(user.votedFor)) {
                 user.votedFor.forEach(place => {
                     if (place) {
                         voteCounts[place] = (voteCounts[place] || 0) + 1;
@@ -869,7 +876,7 @@ function renderVotesList() {
         filteredUsers = filteredUsers.filter(([key, user]) => {
             if (!user) return false;
             const userName = user.name || '';
-            const userVotes = user.votedFor || [];
+            const userVotes = Array.isArray(user.votedFor) ? user.votedFor : [];
             return userName.toLowerCase().includes(searchTerm) ||
                    userVotes.some(place => place && place.toLowerCase().includes(searchTerm));
         });
@@ -890,7 +897,7 @@ function renderVotesList() {
     container.innerHTML = filteredUsers.map(([key, user]) => {
         if (!user) return '';
         
-        const userVotes = user.votedFor || [];
+        const userVotes = Array.isArray(user.votedFor) ? user.votedFor : [];
         
         return `
             <div class="vote-item">
@@ -924,7 +931,11 @@ function renderVotesList() {
 
 // Модальное окно для изменения голосов
 function showVotingModal() {
-    const currentUserVotes = votingData[currentUserKey] ? votingData[currentUserKey].votedFor : [];
+    // ГАРАНТИРУЕМ безопасный доступ к данным
+    const currentUserData = votingData[currentUserKey];
+    const currentUserVotes = currentUserData && Array.isArray(currentUserData.votedFor) 
+        ? currentUserData.votedFor 
+        : [];
     
     let modalHTML = `
         <div class="image-modal show" id="voting-modal">
@@ -1007,6 +1018,31 @@ function saveVotesFromModal() {
     showNotification('Ваши голоса сохранены! 🗳️', 'success');
 }
 
+// Функция для сброса всех голосов (используйте осторожно!)
+function resetAllVotes() {
+    if (confirm('⚠️ Вы уверены, что хотите сбросить ВСЕ голосования? Это действие нельзя отменить!')) {
+        const updates = {};
+        Object.keys(users).forEach(key => {
+            updates['votes/' + key] = {
+                name: users[key].name,
+                role: users[key].role,
+                avatar: users[key].avatar,
+                votedFor: []
+            };
+        });
+        
+        window.db.ref().update(updates)
+            .then(() => {
+                showNotification('Все голосования сброшены! 🔄', 'success');
+                setTimeout(() => location.reload(), 1500);
+            })
+            .catch(error => {
+                console.error('❌ Ошибка сброса:', error);
+                showNotification('Ошибка при сбросе голосований', 'error');
+            });
+    }
+}
+
 // Поиск в списке голосов
 function setupVotesSearch() {
     const searchInput = document.getElementById('votes-search');
@@ -1014,35 +1050,6 @@ function setupVotesSearch() {
         searchInput.addEventListener('input', renderVotesList);
     }
 }
-
-// Функция отладки для мобильного тестирования
-function debugUserInfo() {
-    console.log('=== DEBUG INFO ===');
-    console.log('currentUserKey:', currentUserKey);
-    console.log('currentUser:', users[currentUserKey]);
-    console.log('votingData:', votingData);
-    console.log('localStorage:', localStorage.getItem('currentUser'));
-    showNotification(`Текущий пользователь: ${currentUserKey}`, 'success');
-}
-
-// Добавляем кнопку отладки в интерфейс
-document.addEventListener('DOMContentLoaded', function() {
-    const debugBtn = document.createElement('button');
-    debugBtn.textContent = 'DEBUG';
-    debugBtn.style.position = 'fixed';
-    debugBtn.style.bottom = '10px';
-    debugBtn.style.right = '10px';
-    debugBtn.style.zIndex = '10000';
-    debugBtn.style.background = 'red';
-    debugBtn.style.color = 'white';
-    debugBtn.style.padding = '10px';
-    debugBtn.style.borderRadius = '5px';
-    debugBtn.style.border = 'none';
-    debugBtn.style.cursor = 'pointer';
-    debugBtn.style.fontSize = '12px';
-    debugBtn.onclick = debugUserInfo;
-    document.body.appendChild(debugBtn);
-});
 
 // Обработчики событий
 loginBtn.addEventListener('click', login);
@@ -1167,9 +1174,6 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
-// Удаляем старый интервал авто-обновления, так как Firebase обновляет в реальном времени
-// Вместо этого используем слушатель Firebase в loadVotingDataFromFirebase
-
 // Показ уведомления о новом голосовании
 window.addEventListener('storage', (e) => {
     if (e.key === 'sborVotingData') {
@@ -1195,4 +1199,13 @@ console.log('🗳️ Система голосования с Firebase акти�
 console.log('Доступные команды:');
 console.log('   - showVotingModal() - открыть окно выбора голосов');
 console.log('   - renderVotingResults() - перерисовать результаты');
+console.log('   - resetAllVotes() - сбросить все голосования (осторожно!)');
 console.log('   - debugUserInfo() - отладочная информация');
+
+// Функция для отладки информации о пользователе
+function debugUserInfo() {
+    console.log('🔍 Отладочная информация:');
+    console.log('   currentUserKey:', currentUserKey);
+    console.log('   votingData[currentUserKey]:', votingData[currentUserKey]);
+    console.log('   localStorage currentUser:', localStorage.getItem('currentUser'));
+}
