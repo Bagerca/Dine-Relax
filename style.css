@@ -1355,6 +1355,51 @@ body {
     75% { transform: translateX(5px); }
 }
 
+/* Стили для новой горизонтальной диаграммы */
+.chart-wrapper {
+    position: relative;
+    overflow: hidden;
+}
+
+.chart-container {
+    position: relative;
+}
+
+/* Анимация для баров диаграммы */
+@keyframes barGrowth {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
+}
+
+.chart-bar {
+    animation: barGrowth 0.8s ease-out;
+    transform-origin: left center;
+}
+
+/* Улучшение читаемости для диаграммы */
+.chart-legend {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+    background: var(--gradient-primary);
+}
+
 /* Адаптивность */
 @media (max-width: 968px) {
     .voting-stats {
