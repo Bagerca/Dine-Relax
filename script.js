@@ -765,7 +765,7 @@ function renderVotingResults() {
     renderVotesList();
 }
 
-// Рендеринг диаграммы - НОВАЯ ВЕРСИЯ с горизонтальными барами
+// Рендеринг диаграммы - УЛУЧШЕННАЯ ВЕРТИКАЛЬНАЯ ДИАГРАММА
 function renderChart() {
     const canvas = document.getElementById('votes-chart');
     if (!canvas) {
@@ -778,7 +778,7 @@ function renderChart() {
     
     // Устанавливаем размеры canvas
     canvas.width = container.clientWidth;
-    canvas.height = container.clientHeight;
+    canvas.height = 400; // Фиксированная высота для вертикальной диаграммы
     
     // Очищаем canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -823,70 +823,123 @@ function renderChart() {
     }
     
     const maxVotes = Math.max(...Object.values(voteCounts));
-    const barHeight = 40;
-    const barSpacing = 15;
-    const textMargin = 10;
-    const maxBarWidth = canvas.width - 200; // Оставляем место для текста
+    
+    // Настройки для вертикальной диаграммы
+    const padding = { top: 40, right: 40, bottom: 80, left: 80 };
+    const chartWidth = canvas.width - padding.left - padding.right;
+    const chartHeight = canvas.height - padding.top - padding.bottom;
+    const barWidth = Math.min(60, chartWidth / sortedPlaces.length - 10);
+    const barSpacing = (chartWidth - (barWidth * sortedPlaces.length)) / (sortedPlaces.length + 1);
     
     // Фон для всей диаграммы
     ctx.fillStyle = 'rgba(255, 255, 255, 0.02)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
-    // Рисуем горизонтальные бары
+    // Рисуем вертикальные бары
     sortedPlaces.forEach(([place, votes], index) => {
-        const y = 50 + index * (barHeight + barSpacing);
-        const barWidth = (votes / maxVotes) * maxBarWidth;
-        
-        // Пропускаем если выходит за границы
-        if (y > canvas.height - 50) return;
+        const x = padding.left + barSpacing + index * (barWidth + barSpacing);
+        const barHeight = (votes / maxVotes) * chartHeight;
+        const y = padding.top + chartHeight - barHeight;
         
         // Градиент для бара
-        const gradient = ctx.createLinearGradient(0, y, 0, y + barHeight);
+        const gradient = ctx.createLinearGradient(x, y, x, y + barHeight);
         gradient.addColorStop(0, '#ff6b35');
         gradient.addColorStop(1, '#ff8c5a');
         
         // Бар
         ctx.fillStyle = gradient;
-        roundRect(ctx, 150, y, barWidth, barHeight, 8);
+        roundRect(ctx, x, y, barWidth, barHeight, 8);
         
         // Тень
         ctx.shadowColor = 'rgba(255, 107, 53, 0.3)';
         ctx.shadowBlur = 10;
-        ctx.shadowOffsetX = 5;
-        roundRect(ctx, 150, y, barWidth, barHeight, 8);
+        ctx.shadowOffsetY = 5;
+        roundRect(ctx, x, y, barWidth, barHeight, 8);
         ctx.shadowColor = 'transparent';
         
-        // Название места (сокращаем если длинное)
+        // Количество голосов над баром
         ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-primary');
-        ctx.font = '14px Inter';
-        ctx.textAlign = 'left';
-        ctx.textBaseline = 'middle';
+        ctx.font = 'bold 14px Inter';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'bottom';
+        ctx.fillText(votes, x + barWidth / 2, y - 5);
         
-        let displayName = place;
-        if (displayName.length > 20) {
-            displayName = displayName.substring(0, 20) + '...';
-        }
-        ctx.fillText(displayName, textMargin, y + barHeight / 2);
-        
-        // Количество голосов
-        ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-primary');
-        ctx.font = 'bold 16px Inter';
-        ctx.textAlign = 'right';
-        ctx.fillText(votes, 140, y + barHeight / 2);
-        
-        // Процент голосов
-        const percentage = totalVotes > 0 ? ((votes / totalVotes) * 100).toFixed(1) : 0;
+        // Название места под баром (с переносом строк)
         ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-secondary');
         ctx.font = '12px Inter';
-        ctx.textAlign = 'left';
-        ctx.fillText(`${percentage}%`, 155 + barWidth + 5, y + barHeight / 2);
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+        
+        let displayName = place;
+        // Разбиваем длинные названия на две строки
+        if (displayName.length > 15) {
+            const words = displayName.split(' ');
+            let line1 = '';
+            let line2 = '';
+            
+            for (const word of words) {
+                if ((line1 + word).length <= 15) {
+                    line1 += (line1 ? ' ' : '') + word;
+                } else {
+                    line2 += (line2 ? ' ' : '') + word;
+                }
+            }
+            
+            if (line2.length > 15) {
+                line2 = line2.substring(0, 14) + '…';
+            }
+            
+            ctx.fillText(line1, x + barWidth / 2, padding.top + chartHeight + 10);
+            if (line2) {
+                ctx.fillText(line2, x + barWidth / 2, padding.top + chartHeight + 25);
+            }
+        } else {
+            ctx.fillText(displayName, x + barWidth / 2, padding.top + chartHeight + 10);
+        }
+        
+        // Процент голосов внутри бара (если достаточно места)
+        if (barHeight > 30) {
+            const percentage = totalVotes > 0 ? ((votes / totalVotes) * 100).toFixed(1) : 0;
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 11px Inter';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(`${percentage}%`, x + barWidth / 2, y + barHeight / 2);
+        }
     });
     
-    // Заголовок оси
-    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-muted');
-    ctx.font = '12px Inter';
+    // Ось Y (количество голосов)
+    ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--border');
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(padding.left, padding.top);
+    ctx.lineTo(padding.left, padding.top + chartHeight);
+    ctx.stroke();
+    
+    // Засечки на оси Y
+    for (let i = 0; i <= 5; i++) {
+        const y = padding.top + chartHeight - (i / 5) * chartHeight;
+        const value = Math.round((i / 5) * maxVotes);
+        
+        ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--border');
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(padding.left - 5, y);
+        ctx.lineTo(padding.left, y);
+        ctx.stroke();
+        
+        ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-secondary');
+        ctx.font = '12px Inter';
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(value, padding.left - 10, y);
+    }
+    
+    // Заголовок
+    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-primary');
+    ctx.font = 'bold 16px Inter';
     ctx.textAlign = 'center';
-    ctx.fillText('Количество голосов →', canvas.width / 2, 30);
+    ctx.fillText('Результаты голосования', canvas.width / 2, 20);
 }
 
 // Вспомогательная функция для скругленных прямоугольников
