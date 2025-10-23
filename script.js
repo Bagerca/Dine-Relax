@@ -201,24 +201,55 @@ let currentUserKey = '';
 
 // Загрузка данных голосования из Firebase
 function loadVotingDataFromFirebase() {
-    const votesRef = window.db.ref('votes');
-    votesRef.on('value', (snapshot) => {
-        const data = snapshot.val();
-        votingData = data || {};
-        renderVotingResults();
-        updateVoteButtons();
-    });
+    try {
+        console.log('🔄 Загрузка данных из Firebase...');
+        const votesRef = window.db.ref('votes');
+        votesRef.on('value', (snapshot) => {
+            const data = snapshot.val();
+            console.log('📊 Данные получены из Firebase:', data);
+            votingData = data || {};
+            console.log('📈 votingData после обновления:', votingData);
+            renderVotingResults();
+            updateVoteButtons();
+        }, (error) => {
+            console.error('❌ Ошибка загрузки из Firebase:', error);
+            showNotification('Ошибка загрузки данных голосования', 'error');
+        });
+    } catch (error) {
+        console.error('❌ Ошибка в loadVotingDataFromFirebase:', error);
+    }
 }
 
 // Сохранение голоса в Firebase
 function saveVoteToFirebase(userKey, voteData) {
-    const updates = {};
-    updates['votes/' + userKey] = voteData;
-    return window.db.ref().update(updates);
+    return new Promise((resolve) => {
+        try {
+            const updates = {};
+            updates['votes/' + userKey] = voteData;
+            
+            console.log('💾 Сохраняем в Firebase:', updates);
+            
+            window.db.ref().update(updates)
+                .then(() => {
+                    console.log('✅ Успешно сохранено в Firebase');
+                    resolve(true);
+                })
+                .catch((error) => {
+                    console.error('❌ Ошибка сохранения в Firebase:', error);
+                    showNotification('Ошибка сохранения голоса', 'error');
+                    resolve(false);
+                });
+        } catch (error) {
+            console.error('❌ Ошибка в saveVoteToFirebase:', error);
+            resolve(false);
+        }
+    });
 }
 
 // Обновленная функция голосования
 async function handleVote(placeName) {
+    console.log('🗳️ Начало голосования за:', placeName, 'пользователь:', currentUserKey);
+    
     if (!currentUserKey) {
         showNotification('Для голосования необходимо войти в систему', 'error');
         return;
@@ -230,39 +261,56 @@ async function handleVote(placeName) {
         return;
     }
     
-    // Загружаем актуальные данные
-    await loadVotingDataFromFirebase();
-    
-    if (!votingData[currentUserKey]) {
-        votingData[currentUserKey] = {
+    try {
+        // Создаем копию текущих данных
+        const userVotes = votingData[currentUserKey] ? [...votingData[currentUserKey].votedFor] : [];
+        const hasVoted = userVotes.includes(placeName);
+        
+        let newVotes;
+        if (hasVoted) {
+            // Убираем голос
+            newVotes = userVotes.filter(place => place !== placeName);
+            showNotification(`Голос за "${placeName}" отменен`, 'success');
+        } else {
+            // Добавляем голос
+            newVotes = [...userVotes, placeName];
+            showNotification(`Вы проголосовали за "${placeName}"! 👍`, 'success');
+        }
+        
+        // Создаем объект для сохранения
+        const voteData = {
             name: currentUser.name,
             role: currentUser.role,
             avatar: currentUser.avatar,
-            votedFor: []
+            votedFor: newVotes
         };
-    }
-    
-    const userVote = votingData[currentUserKey];
-    const hasVoted = userVote.votedFor.includes(placeName);
-    
-    if (hasVoted) {
-        userVote.votedFor = userVote.votedFor.filter(place => place !== placeName);
-        showNotification(`Голос за "${placeName}" отменен`, 'success');
-    } else {
-        userVote.votedFor.push(placeName);
-        showNotification(`Вы проголосовали за "${placeName}"! 👍`, 'success');
-    }
-    
-    // Сохраняем в Firebase
-    const success = await saveVoteToFirebase(currentUserKey, userVote);
-    if (success) {
-        // Данные автоматически обновятся через слушатель в loadVotingDataFromFirebase
+        
+        console.log('📝 Новые данные для сохранения:', voteData);
+        
+        // Сохраняем в Firebase
+        const success = await saveVoteToFirebase(currentUserKey, voteData);
+        
+        if (success) {
+            // Обновляем локальные данные
+            votingData[currentUserKey] = voteData;
+            console.log('🔄 Локальные данные обновлены:', votingData);
+            
+            // Принудительно обновляем UI
+            renderVotingResults();
+            updateVoteButtons();
+        }
+        
+    } catch (error) {
+        console.error('❌ Ошибка в handleVote:', error);
+        showNotification('Ошибка при голосовании', 'error');
     }
 }
 
 // Обновленная инициализация системы голосования
 function initVotingSystem() {
-    loadVotingDataFromFirebase(); // Используем Firebase вместо localStorage
+    console.log('🚀 Инициализация системы голосования...');
+    votingData = {}; // Сбрасываем данные
+    loadVotingDataFromFirebase(); // Загружаем заново
     setupVotingButtons();
     setupVotesSearch();
 }
@@ -665,6 +713,7 @@ function updateVoteButtons() {
 
 // Рендеринг результатов голосования
 function renderVotingResults() {
+    console.log('🎯 Рендеринг результатов голосования...');
     renderChart();
     renderVotesList();
 }
@@ -672,7 +721,10 @@ function renderVotingResults() {
 // Рендеринг диаграммы
 function renderChart() {
     const canvas = document.getElementById('votes-chart');
-    if (!canvas) return;
+    if (!canvas) {
+        console.log('❌ Canvas не найден');
+        return;
+    }
     
     const ctx = canvas.getContext('2d');
     const container = canvas.parentElement;
@@ -684,13 +736,24 @@ function renderChart() {
     // Очищаем canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    // Считаем голоса
+    console.log('🎨 Рендерим диаграмму с votingData:', votingData);
+    
+    // Считаем голоса с защитой от ошибок
     const voteCounts = {};
-    Object.values(votingData).forEach(user => {
-        user.votedFor.forEach(place => {
-            voteCounts[place] = (voteCounts[place] || 0) + 1;
+    
+    if (votingData && typeof votingData === 'object') {
+        Object.values(votingData).forEach(user => {
+            if (user && user.votedFor && Array.isArray(user.votedFor)) {
+                user.votedFor.forEach(place => {
+                    if (place) {
+                        voteCounts[place] = (voteCounts[place] || 0) + 1;
+                    }
+                });
+            }
         });
-    });
+    }
+    
+    console.log('📊 Результаты подсчета:', voteCounts);
     
     // Сортируем по количеству голосов
     const sortedPlaces = Object.entries(voteCounts)
@@ -698,7 +761,10 @@ function renderChart() {
     
     // Обновляем общее количество голосов
     const totalVotes = Object.values(voteCounts).reduce((sum, count) => sum + count, 0);
-    document.getElementById('total-votes-count').textContent = totalVotes;
+    const totalVotesElement = document.getElementById('total-votes-count');
+    if (totalVotesElement) {
+        totalVotesElement.textContent = totalVotes;
+    }
     
     if (sortedPlaces.length === 0) {
         // Показываем сообщение когда нет голосов
@@ -755,57 +821,71 @@ function renderChart() {
 // Рендеринг списка голосов
 function renderVotesList() {
     const container = document.getElementById('votes-list');
-    if (!container) return;
+    if (!container) {
+        console.log('❌ Контейнер списка голосов не найден');
+        return;
+    }
     
     const searchTerm = document.getElementById('votes-search')?.value.toLowerCase() || '';
     
-    let filteredUsers = Object.entries(votingData);
+    let filteredUsers = votingData ? Object.entries(votingData) : [];
     
     // Фильтрация по поиску
     if (searchTerm) {
-        filteredUsers = filteredUsers.filter(([key, user]) => 
-            user.name.toLowerCase().includes(searchTerm) ||
-            user.votedFor.some(place => place.toLowerCase().includes(searchTerm))
-        );
+        filteredUsers = filteredUsers.filter(([key, user]) => {
+            if (!user) return false;
+            const userName = user.name || '';
+            const userVotes = user.votedFor || [];
+            return userName.toLowerCase().includes(searchTerm) ||
+                   userVotes.some(place => place && place.toLowerCase().includes(searchTerm));
+        });
     }
+    
+    console.log('👥 Рендерим список голосов:', filteredUsers);
     
     if (filteredUsers.length === 0) {
         container.innerHTML = `
             <div class="no-votes" style="text-align: center; padding: 2rem; color: var(--text-muted);">
                 <i class="fas fa-users" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
-                <p>Пока никто не проголосовал</p>
+                <p>${searchTerm ? 'Ничего не найдено' : 'Пока никто не проголосовал'}</p>
             </div>
         `;
         return;
     }
     
-    container.innerHTML = filteredUsers.map(([key, user]) => `
-        <div class="vote-item">
-            <div class="voter-avatar">${user.avatar}</div>
-            <div class="voter-info">
-                <div class="voter-name">${user.name}</div>
-                <div class="voter-role">${user.role}</div>
-                ${user.votedFor.length > 0 ? `
-                    <div class="vote-selection">
-                        ${user.votedFor.map(place => `
-                            <span class="voted-place">
-                                <i class="fas fa-map-marker-alt"></i>
-                                ${place}
-                            </span>
-                        `).join('')}
-                    </div>
-                ` : '<div class="vote-selection" style="color: var(--text-muted); font-size: 0.9rem;">Ещё не голосовал</div>'}
-            </div>
-            ${key === currentUserKey ? `
-                <div class="vote-actions">
-                    <button class="change-vote-btn">
-                        <i class="fas fa-edit"></i>
-                        Изменить
-                    </button>
+    container.innerHTML = filteredUsers.map(([key, user]) => {
+        if (!user) return '';
+        
+        const userVotes = user.votedFor || [];
+        
+        return `
+            <div class="vote-item">
+                <div class="voter-avatar">${user.avatar || '?'}</div>
+                <div class="voter-info">
+                    <div class="voter-name">${user.name || 'Неизвестный'}</div>
+                    <div class="voter-role">${user.role || 'Ученик'}</div>
+                    ${userVotes.length > 0 ? `
+                        <div class="vote-selection">
+                            ${userVotes.map(place => `
+                                <span class="voted-place">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    ${place}
+                                </span>
+                            `).join('')}
+                        </div>
+                    ` : '<div class="vote-selection" style="color: var(--text-muted); font-size: 0.9rem;">Ещё не голосовал</div>'}
                 </div>
-            ` : ''}
-        </div>
-    `).join('');
+                ${key === currentUserKey ? `
+                    <div class="vote-actions">
+                        <button class="change-vote-btn">
+                            <i class="fas fa-edit"></i>
+                            Изменить
+                        </button>
+                    </div>
+                ` : ''}
+            </div>
+        `;
+    }).join('');
 }
 
 // Модальное окно для изменения голосов
