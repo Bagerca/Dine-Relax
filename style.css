@@ -359,6 +359,17 @@ body {
     transform: translateY(-2px);
 }
 
+/* Стили для кнопки управления */
+.management-btn {
+    background: var(--success) !important;
+    border-color: var(--success) !important;
+}
+
+.management-btn:hover {
+    background: #00b359 !important;
+    transform: translateY(-2px);
+}
+
 /* Контент область */
 .content-area {
     max-width: 1400px;
