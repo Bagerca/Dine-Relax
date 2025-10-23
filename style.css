@@ -1305,6 +1305,56 @@ body {
     color: white;
 }
 
+/* Стили для модального окна голосования */
+.voting-options {
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent) var(--border);
+}
+
+.voting-options::-webkit-scrollbar {
+    width: 6px;
+}
+
+.voting-options::-webkit-scrollbar-track {
+    background: var(--border);
+    border-radius: 3px;
+}
+
+.voting-options::-webkit-scrollbar-thumb {
+    background: var(--accent);
+    border-radius: 3px;
+}
+
+.voting-options::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-hover);
+}
+
+/* Улучшение для чекбоксов в темной теме */
+.voting-option input[type="checkbox"] {
+    filter: brightness(0.8);
+}
+
+.voting-option input[type="checkbox"]:checked {
+    filter: brightness(1);
+}
+
+/* Анимация для опций голосования */
+.voting-option {
+    transition: all 0.3s ease;
+}
+
+.voting-option:hover {
+    transform: translateX(5px);
+    border-color: var(--accent) !important;
+}
+
+/* Анимация тряски для ошибок */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
 /* Адаптивность */
 @media (max-width: 968px) {
     .voting-stats {
@@ -1458,6 +1508,16 @@ body {
     
     .change-vote-btn {
         flex: 1;
+    }
+    
+    /* Улучшение отзывчивости для модальных окон голосования */
+    .image-modal-content[style*="max-width: 600px"] {
+        margin: 0.5rem;
+        width: calc(100% - 1rem);
+    }
+    
+    .voting-options {
+        max-height: 300px;
     }
 }
 
