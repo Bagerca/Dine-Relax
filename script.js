@@ -17,7 +17,7 @@ const users = {
     'Z3H4A5N6': { name: 'Ермуханов Жанахмед', role: 'Ученик', avatar: 'ЖЕ' },
     'L7I8A9N0': { name: 'Калинина Лиана', role: 'Ученик', avatar: 'ЛК' },
     'E1V2G3E4': { name: 'Кочмар Евгения', role: 'Ученик', avatar: 'ЕК' },
-    'E5L6I7Z8': { name: 'Леонтьева Елизавета', role: 'Ученик', avatar: 'ЕЛ' },
+    'L1E2O3N4': { name: 'Леонтьева Елизавета', role: 'Ученик', avatar: 'ЕЛ' },
     'E9L0I1Z2': { name: 'Надьярная Елизавета', role: 'Ученик', avatar: 'ЕН' },
     'K3S4E5N6': { name: 'Очакова Ксения', role: 'Ученик', avatar: 'КО' },
     'A7L8I9N0': { name: 'Пяжиева Алина', role: 'Ученик', avatar: 'АП' },
@@ -34,174 +34,190 @@ const users = {
 // Данные о местах с координатами
 const placesData = {
     'Кофейня «Veranda»': {
-        coords: [59.880945, 29.112260],
-        address: 'Сосновый Бор, Солнечная улица, 12, ТРК «Галактика»',
-        description: 'Спешелти кофейня со свежеобжаренным зерном, домашними десертами и вегетарианскими блюдами',
-        phone: '+7 (921) 904-69-20',
+        coords: [59.900926, 29.085823],
+        address: 'Солнечная ул., 12, Сосновый Бор',
+        description: 'Кофейня Veranda — это уютное место с приятной атмосферой, где можно провести время за чашечкой кофе или какао, а также насладиться изысканными десертами, такими как чизкейк «Сан-Себастьян» или трайфл.',
+        phone: '+7 (812) 219-15-92',
         workingHours: 'Пн-Чт: 10:00–20:00, Пт-Вс: 10:00–21:00',
-        rating: 4.8,
-        reviewsCount: 334,
+        rating: 5.0,
+        reviewsCount: 954,
         price: '$$',
-        features: ['Wi-Fi', 'Парковка', 'Терраса', 'Доступно с животными', 'Бесплатная вода'],
+        features: ['Еда навынос', 'Оплата картой', 'Wi-Fi'],
         social: 'vk.com/verandacoffee'
     },
-    'Ресторан «ПхалиХинкали»': {
-        coords: [59.880479, 29.117188],
-        address: 'Сосновый Бор, Ленинградская улица, 46',
-        description: 'Аутентичный ресторан грузинской кухни, известный сочными хинкали и традиционными блюдами',
-        phone: '+7 (812) 904-44-90',
-        workingHours: 'Пн-Чт: 12:00–23:00, Пт-Сб: 12:00–00:00, Вс: 12:00–23:00',
-        rating: 4.6,
-        reviewsCount: 1382,
-        price: '$$',
-        features: ['Детская площадка', 'Банкетный зал', 'Доставка', 'Живая музыка'],
-        social: 'phali-hinkali.ru/sbr'
-    },
-    'Ресторан «Токио-Сити»': {
-        coords: [59.880945, 29.112260],
-        address: 'Сосновый Бор, Солнечная улица, 12, ТРК «Галактика», 3 этаж',
-        description: 'Ресторан с широким выбором блюд японской, итальянской, мексиканской и других кухонь',
-        phone: '+7 (812) 677-41-12',
-        workingHours: 'Пн-Чт: 12:00–23:00, Пт-Сб: 12:00–01:00, Вс: 12:00–23:00',
-        rating: 3.9,
-        reviewsCount: 26,
-        price: '$$',
-        features: ['600+ позиций в меню', 'Доставка', 'Бронирование', 'Детское меню'],
-        social: 'tokyo-city.ru/spb/restaurants/sosnovyy-bor'
-    },
-    'Гастробар «Хеваа»': {
-        coords: [59.897457, 29.117188],
-        address: 'Сосновый Бор, Устьинская улица, 11/2',
-        description: 'Гриль-бар при комплексе Hevaa с блюдами на гриле, бургерами, стейками и уютной атмосферой у моря',
-        phone: '+7 (812) 220-15-22',
-        workingHours: 'Круглосуточно',
-        rating: 4.3,
-        reviewsCount: 1213,
-        price: '$$',
-        features: ['Круглосуточно', 'Беседки', 'Летняя площадка', 'Гриль', 'Коктейли'],
-        social: 'hevaa.ru'
-    },
-    'Гранд-кафе «Багратион»': {
-        coords: [59.886361, 29.117621],
-        address: 'Сосновый Бор, Проспект Героев, 65A',
-        description: 'Гранд-кафе с разнообразной европейской и грузинской кухней, живой музыкой и уютной атмосферой',
-        phone: '+7 (965) 752-22-82',
-        workingHours: 'Пн-Чт: 11:00–23:00, Пт-Сб: 11:00–01:00, Вс: 11:00–23:00',
-        rating: 4.3,
-        reviewsCount: 260,
-        price: '$$',
-        features: ['Живая музыка', 'Доставка', 'Бесплатная парковка', 'Европейская кухня'],
-        social: ''
-    },
-    'Кинотеатр «Современник»': {
-        coords: [59.91185, 29.07062],
-        address: 'Сосновый Бор, Комсомольская улица, 17',
-        description: 'Городской кинотеатр с суши-баром «Кин-но». Удобные кресла, хорошее качество звука. Идеальное место для отдыха с просмотром фильмов и японской кухней.',
-        phone: '+7 (81369) 2-12-32',
-        workingHours: 'Кинотеатр: 11:00–00:00, Бар «Кин-но»: 12:00–02:00 (до 03:00 Пт-Сб)',
-        rating: 3.9,
-        reviewsCount: 1000,
-        price: '$$',
-        features: ['Суши-бар «Кин-но»', 'Удобные кресла', 'Хороший звук', 'Несколько залов', 'Японская кухни'],
-        social: 'sovremennik.sbor.net'
-    },
-    'Ресторан «Дюны»': {
-        coords: [59.878952, 29.112933],
-        address: 'Улица Соколова, 15, Сосновый Бор',
-        description: 'Уютный семейный ресторан с приглушенным светом и стильным интерьером, который призван возродить атмосферу истории города Сосновый Бор.',
-        phone: '+7 (921) 888-88-35',
-        workingHours: 'Пн-Чт, Вс: 12:30–00:00<br>Пт-Сб: 12:30–02:00',
-        rating: 4.3,
-        reviewsCount: 127,
-        price: '$$',
-        features: ['Wi-Fi', 'Детская комната', 'Детское меню', 'Проведение свадеб', 'Парковка'],
-        social: 'vk.com/dune_rest',
-        category: 'restaurant'
-    },
     'Кафе «Радуга»': {
-        coords: [59.875323, 29.071060],
-        address: 'Улица Красных Фортов, 11, Сосновый Бор',
-        description: 'Уютное и недорогое кафе, где подают блюда домашней кухни, в том числе комплексные обеды.',
+        coords: [59.906109, 29.088920],
+        address: 'ул. Красных Фортов, 11, Сосновый Бор',
+        description: 'Кафе «Радуга» — это уютное место, где можно провести любое мероприятие, будь то день рождения, свадьба или корпоратив.',
         phone: '+7 (81369) 4-26-15',
-        workingHours: 'Ежедневно: 08:30–19:30<br>Перерыв: 15:00–16:00',
+        workingHours: 'Пн-Вс: 10:00–15:00, 16:00–19:30',
         rating: 4.4,
         reviewsCount: 427,
         price: '$',
-        features: ['Бизнес-ланч', 'Поминальные обеды', 'Проведение банкетов', 'Заказ навынос'],
+        features: ['Проведение банкетов', 'Оплата картой', 'Домашняя кухня'],
         social: 'vk.com/raduganiti',
         category: 'cafe'
     },
     'Ресторан «Мой Сосновый Бор»': {
-        coords: [59.880945, 29.112260],
-        address: 'Солнечная улица, 9, Сосновый Бор',
-        description: 'Ресторан европейской кухни с уютным интерьером, подходящий как для завтраков и бизнес-ланчей, так и для проведения банкетов.',
-        phone: '+7 (921) 882-40-02',
-        workingHours: 'Пн-Чт, Вс: 12:00–23:00<br>Пт-Сб: 12:00–00:00',
-        rating: 4.5,
-        reviewsCount: 289,
+        coords: [59.896870, 29.085613],
+        address: 'Солнечная ул., 9, Сосновый Бор',
+        description: 'Ресторан «Мой Сосновый Бор» — это место, где вы можете насладиться разнообразным меню, включающим блюда восточной, итальянской и русской кухни, а также уникальные авторские блюда.',
+        phone: '+7 (921) 777-77-50',
+        workingHours: 'Пн-Чт: 12:00–23:00, Пт-Сб: 12:00–00:00, Вс: 12:00–23:00',
+        rating: 5.0,
+        reviewsCount: 2008,
         price: '$$',
-        features: ['Wi-Fi', 'Бизнес-ланч', 'Завтрак', 'Винная карта', 'Проведение банкетов', 'Заказ навынос', 'Можно с ноутбуком'],
-        social: 'vk.com/msb_rest',
-        category: 'restaurant'
+        features: ['Доставка еды', 'Еда навынос', 'Оплата картой', 'Wi-Fi'],
+        social: 'vk.com/msb_rest'
     },
-    'Стритфуд «Мой Сосновый Бор»': {
-        coords: [59.904453, 29.071661],
-        address: 'Приморский парк, Сосновый Бор',
-        description: 'Небольшое кафе с блюдами уличной еды, расположенное в Приморском парке, вблизи Финского залива.',
-        phone: '+7 (931) 370-70-00',
-        workingHours: 'Ежедневно: 11:00–22:00',
-        rating: 4.8,
-        reviewsCount: 2104,
+    'Ресторан «ПхалиХинкали»': {
+        coords: [59.897274, 29.078944],
+        address: 'Ленинградская ул., 46, Сосновый Бор',
+        description: '«ПхалиХинкали» в Сосновом Бору — уютный ресторан грузинской кухни, где подают традиционные блюда, включая хинкали, которые готовят прямо на глазах у посетителей. Заведение делает акцент на гостеприимной атмосфере и радушии.',
+        phone: '+7 (812) 219-38-36',
+        workingHours: 'Пн-Чт: 12:00–23:00, Пт-Сб: 12:00–03:00, Вс: 12:00–23:00',
+        rating: 4.7,
+        reviewsCount: 1448,
+        price: '$$',
+        features: ['Доставка еды', 'Еда навынос', 'Оплата картой', 'Wi-Fi'],
+        social: 'phali-hinkali.ru/sbr'
+    },
+    'Ресторан «Токио-Сити»': {
+        coords: [59.900983, 29.085835],
+        address: 'Солнечная ул., 12, ТРК Галактика, этаж 3, Сосновый Бор',
+        description: '«Токио-City» — это ресторан, который предлагает своим гостям широкий выбор блюд, включая суши, роллы, лапшу и другие блюда японской кухни, а также блюда других кухонь, таких как итальянская, восточноевропейская и китайская.',
+        phone: '+7 (812) 677-41-12',
+        workingHours: 'Пн-Чт: 12:00–23:00, Пт-Сб: 12:00–01:00, Вс: 12:00–23:00',
+        rating: 4.9,
+        reviewsCount: 804,
+        price: '$$$',
+        features: ['Доставка еды', 'Еда навынос', 'Оплата картой'],
+        social: 'tokyo-city.ru/spb/restaurants/sosnovyy-bor'
+    },
+    'Кафе «Багратион»': {
+        coords: [59.912736, 29.095742],
+        address: 'просп. Героев, 65А, Сосновый Бор',
+        description: 'Кафе «Багратион» предлагает своим гостям блюда грузинской кухни, приготовленные по традиционным рецептам.',
+        phone: '+7 (965) 752-22-82',
+        workingHours: 'Пн-Вс: 11:00–23:00',
+        rating: 4.4,
+        reviewsCount: 820,
+        price: '$$',
+        features: ['Wi-Fi', 'Оплата картой', 'Грузинская кухня'],
+        social: ''
+    },
+    'Ресторан «Дюны»': {
+        coords: [59.888713, 29.071764],
+        address: 'ул. Соколова, 19, Сосновый Бор',
+        description: 'Ресторан «Дюны» — это уютное место с приглушенным светом, стильным интерьером и удобными сиденьями. Здесь играет приятная музыка, а официанты всегда готовы помочь с выбором блюд.',
+        phone: '+7 (921) 888-88-35',
+        workingHours: 'Пн-Пт: 08:00–12:00, 12:30–00:00, Сб-Вс: 08:00–12:00, 12:30–02:00',
+        rating: 5.0,
+        reviewsCount: 1936,
+        price: '$$',
+        features: ['Доставка еды', 'Еда навынос', 'Оплата картой', 'Wi-Fi'],
+        social: 'vk.com/dune_rest'
+    },
+    'Кофейня «Мой Сосновый Бор»': {
+        coords: [59.896753, 29.086056],
+        address: 'Солнечная ул., 9, Сосновый Бор',
+        description: 'Кофейня «Мой Сосновый Бор» — это уютное место с интересным интерьером, где можно поиграть в настольные игры, почитать книги и даже поиграть на фортепиано.',
+        phone: '+7 (921) 882-40-02',
+        workingHours: 'Пн-Пт: 09:00–22:00, Сб-Вс: 10:00–22:00',
+        rating: 5.0,
+        reviewsCount: 4469,
         price: '$',
-        features: ['Еда навынос', 'Расположение в парке', 'Рядом с заливом'],
-        social: 'vk.com/msb_park',
-        category: 'cafe'
+        features: ['Доставка еды', 'Еда навынос', 'Оплата картой', 'Wi-Fi', 'Настольные игры'],
+        social: 'vk.com/msb_coffee'
+    },
+    'Территория отдыха Hevaa': {
+        coords: [59.894809, 29.059631],
+        address: 'Устьинская ул., 11/2, Сосновый Бор',
+        description: '«Территория отдыха Hevaa» — это база отдыха, расположенная на берегу Финского залива, в окружении соснового леса. Гостям предлагается проживание в номерах различных категорий, включая номера с антресольным этажом, сауной и балконом с видом на лес.',
+        phone: '+7 (812) 220-15-22',
+        workingHours: 'Круглосуточно',
+        rating: 4.9,
+        reviewsCount: 3595,
+        price: '$$$',
+        features: ['Оплата картой', 'Кафе', 'Wi-Fi', 'Проживание'],
+        social: 'hevaa.ru'
+    },
+    'Кинотеатр «Современник»': {
+        coords: [59.891682, 29.092144],
+        address: 'Комсомольская ул., 17, Сосновый Бор',
+        description: '«Современник» — кинотеатр в городе Сосновый Бор, открытый в 1969 году. Он расположен по адресу Комсомольская улица, 17. При кинотеатре работает суши-бар «КИН-НО», где также проходят караоке-вечеринки.',
+        phone: 'Информация уточняется',
+        workingHours: 'Пн-Вс: 11:00–00:00',
+        rating: 4.1,
+        reviewsCount: 1912,
+        price: '$$',
+        features: ['3D', 'Суши-бар', 'Караоке'],
+        social: 'sovremennik.sbor.net'
     }
 };
 
 // Данные с изображениями для каждого заведения
 const placeImages = {
     'Кофейня «Veranda»': [
+        'https://avatars.mds.yandex.net/get-tycoon/1534598/2a0000017c75a99d855d166d202e6686dcd6/priority-headline-main-narrow',
         'https://avatars.mds.yandex.net/get-altay/13054604/2a00000190a77560adb2066c2b0ff460732b/XXXL',
+        'https://avatars.mds.yandex.net/get-altay/5110793/2a0000017c7e9bdff287847bfb67a9c8e183/XXXL',
         'https://avatars.mds.yandex.net/get-altay/14014620/2a000001912c9dca1b4e62d778d484446b94/XXXL',
-        'https://avatars.mds.yandex.net/get-altay/5456504/2a0000017c7ea8dd69a6f7b112b5640b870d/XXXL'
-    ],
-    'Ресторан «ПхалиХинкали»': [
-        'https://example.com/phali-dishes.jpg',
-        'https://example.com/phali-interior.jpg',
-        'https://example.com/phali-hinkali.jpg'
-    ],
-    'Ресторан «Токио-Сити»': [
-        'https://example.com/tokyo-interior.jpg',
-        'https://example.com/tokyo-sushi.jpg'
-    ],
-    'Гранд-кафе «Багратион»': [
-        'https://example.com/bagration-hall.jpg',
-        'https://example.com/bagration-food.jpg'
-    ],
-    'Гастробар «Хеваа»': [
-        'https://example.com/hevaa-terrace.jpg',
-        'https://example.com/hevaa-grill.jpg',
-        'https://example.com/hevaa-cocktails.jpg'
-    ],
-    'Кинотеатр «Современник»': [
-        'https://example.com/sovremennik-building.jpg',
-        'https://example.com/sovremennik-hall.jpg',
-        'https://example.com/sovremennik-bar.jpg'
-    ],
-    'Ресторан «Дюны»': [
-        'https://avatars.mds.yandex.net/get-altay/10664848/2a0000017dfb9b5c49e3e56e12b3c3a8a6e1/XXXL'
+        'https://avatars.mds.yandex.net/get-altay/1871013/2a0000016ae686145185b5d052f875f30745/XXXL'
     ],
     'Кафе «Радуга»': [
-        'https://avatars.mds.yandex.net/get-altay/988708/2a00000161c09c5c9a4a5d9d4e5d8b8a8a2e/XXXL'
+        'https://avatars.mds.yandex.net/get-altay/4632172/2a000001792513542f0328995fc9e46cc2bb/XXXL',
+        'https://avatars.mds.yandex.net/get-altay/15074774/2a000001957a1df4c69ac99198dfe504569f/XXXL',
+        'https://avatars.mds.yandex.net/get-altay/14763372/2a000001946ec8fa77567ade32da2a9fa01c/XXXL',
+        'https://avatars.mds.yandex.net/get-altay/6487610/2a00000182e3b9b0601c97e2a9aa13792ef6/XXXL'
     ],
     'Ресторан «Мой Сосновый Бор»': [
-        'https://example.com/msb-restaurant-interior.jpg',
-        'https://example.com/msb-restaurant-food.jpg'
+        'https://avatars.mds.yandex.net/get-altay/12721348/2a00000199cfaef5350356cb0a4ec5fa88be/XXXL',
+        'https://avatars.mds.yandex.net/get-altay/998620/2a0000018775f4bb57efda432a2831e84184/XXXL',
+        'https://avatars.mds.yandex.net/get-altay/4699294/2a0000018775f52c744048e818868536f8ed/XXXL',
+        'https://avatars.mds.yandex.net/get-altay/758957/2a00000187760686b2d2b4b296e776d735e2/XXXL'
     ],
-    'Стритфуд «Мой Сосновый Бор»': [
-        'https://example.com/msb-streetfood-park.jpg',
-        'https://example.com/msb-streetfood-dishes.jpg'
+    'Ресторан «ПхалиХинкали»': [
+        'https://avatars.mds.yandex.net/get-altay/13453452/2a0000018ec32f100640d3bdbf8ddc1b2ab6/XXXL',
+        'https://avatars.mds.yandex.net/get-altay/16410529/2a00000198fb9e0849ce3b25daae741b1e97/XXXL',
+        'https://avatars.mds.yandex.net/get-altay/10328405/2a0000018ec32f0fb983fd4ad170cac3d822/XXXL',
+        'https://avatars.mds.yandex.net/get-altay/13220782/2a00000190b2387e80d7d6ad81da7f8b30ae/XXXL'
+    ],
+    'Ресторан «Токио-Сити»': [
+        'https://avatars.mds.yandex.net/get-tycoon/15404746/2a00000195f0a7d36fcc576f9a78125aed3e/priority-headline-background',
+        'https://avatars.mds.yandex.net/get-altay/15344725/2a00000199c0fa738d9f35d86cd7a25e64f3/XXXL',
+        'https://avatars.mds.yandex.net/get-altay/14839591/2a00000194ccf273ce1efe353a73a9c7e15c/XXXL',
+        'https://avatars.mds.yandex.net/get-altay/14007310/2a00000194eb176d06811ee14ceaaf14a265/XXXL'
+    ],
+    'Кафе «Багратион»': [
+        'https://avatars.mds.yandex.net/get-altay/16136409/2a000001977465e2530b06b3fcf721c2637f/XXXL',
+        'https://avatars.mds.yandex.net/get-altay/2433982/2a00000174923be0636f93d4200ecdc31bb1/XXXL',
+        'https://avatars.mds.yandex.net/get-altay/4464784/2a00000179dc303341139a75ab6f8ee3480d/XXXL',
+        'https://avatars.mds.yandex.net/get-altay/9776062/2a0000018ddc50a77be6230c58a74a3c7072/XXXL'
+    ],
+    'Ресторан «Дюны»': [
+        'https://avatars.mds.yandex.net/get-altay/16542720/2a0000019726ab6728440479096ae33c74e5/XXXL',
+        'https://avatars.mds.yandex.net/get-altay/15608211/2a00000198fbfe5e6b798ea1014f9c16b0a4/XXXL',
+        'https://avatars.mds.yandex.net/get-altay/16465668/2a00000199a9f52de7d8b3992c314ea92f33/XXXL',
+        'https://avatars.mds.yandex.net/get-altay/14306639/2a00000191a86262453581d0635980694d14/XXXL'
+    ],
+    'Кофейня «Мой Сосновый Бор»': [
+        'https://avatars.mds.yandex.net/get-altay/1880508/2a0000016fe209c2e75924537280f6362df0/XXXL',
+        'https://avatars.mds.yandex.net/get-altay/6057477/2a00000181a401d3c1633b8fdaae334863e5/XXXL',
+        'https://avatars.mds.yandex.net/get-altay/1630630/2a0000016fe209d3c0b977c73585855774e4/XXXL',
+        'https://avatars.mds.yandex.net/get-altay/2714499/2a000001736b6ac0fd678354ebee86e2052b/XXXL',
+        'https://avatars.mds.yandex.net/get-altay/1870294/2a0000016fe20a04c0565e29038d4c800484/XXXL'
+    ],
+    'Территория отдыха Hevaa': [
+        'https://avatars.mds.yandex.net/get-altay/14733519/2a00000197bfa80ed578c99379151bc2ca7a/XXXL',
+        'https://avatars.mds.yandex.net/get-altay/16069310/2a00000197bfa8199fac692b343679f24b6e/XXXL',
+        'https://avatars.mds.yandex.net/get-altay/16451941/2a00000197bfa735114ea017b6671d60043d/XXXL'
+    ],
+    'Кинотеатр «Современник»': [
+        'https://avatars.mds.yandex.net/get-altay/14675612/2a00000195a89638d7e7895434baa82b9aaf/XXXL',
+        'https://avatars.mds.yandex.net/get-altay/12820607/2a00000193af860633f20f0b932a3056b8d7/XXXL',
+        'https://avatars.mds.yandex.net/get-altay/11203687/2a00000190264c7b66c2e7b9f64d7386f0ee/XXXL',
+        'https://avatars.mds.yandex.net/get-altay/13286098/2a0000018f587149c6f26c27ad031e25bd5a/XXXL'
     ]
 };
 
